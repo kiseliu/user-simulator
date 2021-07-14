@@ -1,5 +1,5 @@
 import sys, pdb
-sys.path.append('/home/wyshi/simulator')
+sys.path.append('/data/wyshi/simulator')
 from simulator.language_model.counter import build_vocabulary, count_ngrams
 from simulator.language_model.ngram import MLENgramModel
 

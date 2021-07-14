@@ -3,7 +3,7 @@ import sys
 import torch
 import random
 import numpy as np
-sys.path.append('/home/wyshi/simulator/')
+sys.path.append('/data/wyshi/simulator/')
 from sequicity_user.config import global_config as cfg
 from sequicity_user.reader import CamRest676Reader, get_glove_matrix
 from sequicity_user.reader import KvretReader, System_Reader, User_Simulator_Reader, User_Simulator_Act_Reader

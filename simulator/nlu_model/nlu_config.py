@@ -2,8 +2,8 @@ import torch
 import pickle as pkl
 
 class Config():
-    f_path = '/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlu/'
-    vector_cache_path = '/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/vector_cache1'
+    f_path = '/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlu/'
+    vector_cache_path = '/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/vector_cache1'
     feature_name = ['utt']
     label_name = 'y'
     use_gpu = False#torch.cuda.is_available()
@@ -18,8 +18,8 @@ class Config():
 
     num_epochs = 50
 
-    with open('/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlu/labelEncoder.pkl', 'rb') as fh:
+    with open('/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlu/labelEncoder.pkl', 'rb') as fh:
         le = pkl.load(fh)
     num_actions = len(le.classes_)
 
-    model_save_dir = "/home/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"
+    model_save_dir = "/data/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"

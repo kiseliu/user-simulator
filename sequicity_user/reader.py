@@ -459,6 +459,9 @@ class CamRest676Reader(_ReaderBase):
     def db_search(self, constraints):
         match_results = []
         for entry in self.db:
+            if 'location' in entry:
+                del entry['location']
+            # entry_values_list = list(entry.values())
             # print(entry.values())
             # pdb.set_trace()
             entry_values = ' '.join(entry.values())

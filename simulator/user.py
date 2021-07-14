@@ -21,7 +21,7 @@ cur_dir = os.getcwd()
 #     slots_by_state = pkl.load(fh)
 
 data_dir = "data/multiwoz-master/data/multi-woz/"
-with open("/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json", "rb") as fh:
+with open("/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json", "rb") as fh:
     DB = json.load(fh)
 
 
@@ -54,7 +54,7 @@ STATE_TO_SENTS[9] = "i am looking for a restaurant, food, price"
 #                'pricerange': ['dont_care', 'moderate', 'expensive']}
 import pandas as pd
 # DB = pd.read_csv(os.path.join(cur_dir, "data/NNDIAL-master/db/CamRest.csv"))
-with open("/home/wyshi/simulator/data/NNDIAL-master/db/ENTITY_POOL_no_dontcare.pkl", "rb") as fh:
+with open("/data/wyshi/simulator/data/NNDIAL-master/db/ENTITY_POOL_no_dontcare.pkl", "rb") as fh:
     ENTITY_POOL = pkl.load(fh)
 INITIAL_STATE = random.choice([6, 7, 9], size=1)[0]
 
@@ -392,7 +392,7 @@ class User(object):
         self.nlg_sample = nlg_sample
         self.nlg_template = nlg_template
         if self.nlg_sample:
-            with open("/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/act_to_utt_dict_modified.pkl", "rb") as fh:
+            with open("/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/act_to_utt_dict_modified.pkl", "rb") as fh:
                 self.nlg_templates = pkl.load(fh)
             self.generator = retrieval_generator()
         else:

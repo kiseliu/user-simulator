@@ -7,7 +7,7 @@ class EvalConfig(object):
     resume = True
     # resume_rl_model_dir = '/home/wyshi/simulator/model/save/nlg_sample/oneHot_newReward_bitMore/0_2019-5-19-10-54-13-6-139-1.pkl'
 
-    rule_base_sys_nlu = "/home/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"
+    rule_base_sys_nlu = "/data/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"
 
 #######################################################**************
     use_sl_simulator = True
@@ -27,13 +27,13 @@ class EvalConfig(object):
     # user simulator
     nlg_sample = False
     nlg_template = True
-    csv_for_generator = '/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlg/for_generator.csv'
+    csv_for_generator = '/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlg/for_generator.csv'
     generator_debug = True
     topk = 20
 
     # rl
     n_episodes = 30000
-    save_dir = '/data/qkun/simulator/evaluation/cross_test/' # save_dir = '/home/wyshi/simulator/model/save/sl_simulator/retrieval/oneHot_oldReward_bitMore/'#'/home/wyshi/simulator/model/save/sl_simulator/generative/oneHot_oldReward_bitMore/'
+    save_dir = './evaluation/cross_test/' # save_dir = '/home/wyshi/simulator/model/save/sl_simulator/retrieval/oneHot_oldReward_bitMore/'#'/home/wyshi/simulator/model/save/sl_simulator/generative/oneHot_oldReward_bitMore/'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     use_sequicity_for_rl_model = False

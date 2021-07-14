@@ -1,6 +1,6 @@
 import sys
 print(sys.path)
-sys.path.append("/home/wyshi/simulator")
+sys.path.append("/data/wyshi/simulator")
 from simulator.nlu_model.model import NLU_model
 from simulator.nlu_model.data_preprocess import DataProcessor, l2_matrix_norm, AverageMeter, print_cm, eval_
 
