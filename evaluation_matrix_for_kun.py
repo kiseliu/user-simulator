@@ -1,40 +1,34 @@
 from collections import deque
 
-from rl.my_pg import PolicyGradientREINFORCE
-from rl.policy_model import Net
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+import time
+import random
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-# import gym
+
 from beeprint import pp
 from simulator.agent.core import Action, UserAct, SystemAct
-# from sequicity.model import Model
-
-# env_name = 'CartPole-v0'
-# env = gym.make(env_name)
 
 from simulator.user import User
 from simulator.loose_user import LooseUser
-from sequicity_user.seq_user import Seq_User
-from sequicity_user.seq_user_act import Seq_User_Act
 from simulator.system import System
 from simulator.loose_system import LooseSystem
 from simulator.env import Enviroment
+from rl.my_pg import PolicyGradientREINFORCE
+from rl.policy_model import Net
 import simulator.dialog_config as dialog_config
-import numpy as np
+
+from sequicity_user.seq_user import Seq_User
+from sequicity_user.seq_user_act import Seq_User_Act
+
 from evaluation_matrix_config import EvalConfig
 import pdb
-from simulator.agent.core import SystemAct
-from sequicity.config import global_config as seq_cfg
 import argparse
-
-from tqdm import tqdm
-# from sequicity.model import load_rl_model
 
 config = EvalConfig()
 device = config.device
@@ -85,12 +79,12 @@ elif config.nlg_template:
     username += '_template'
 else:
     username += '_sample'
-    
 
-if args.resume_rl_model_dir.split('/')[6] == 'sl_simulator':
-    sysname = 'sl_' + args.resume_rl_model_dir.split('/')[7]
+
+if args.resume_rl_model_dir.split('/')[3] == 'sl_simulator':
+    sysname = 'sl_' + args.resume_rl_model_dir.split('/')[4]
 else:
-    sysname = 'rule_' + args.resume_rl_model_dir.split('/')[6]
+    sysname = 'rule_' + args.resume_rl_model_dir.split('/')[3]
 
 output_name = username + '_' + sysname
 
@@ -108,11 +102,9 @@ if config.use_sl_simulator:
     else:
         user = Seq_User_Act(nlg_sample=config.nlg_sample, nlg_template=config.nlg_template)
 
-
 pp(config)
+print('---' * 30)
 pp(dialog_config)
-
-
 
 env = Enviroment(user=user, system=system, verbose=True, config=config)
 sys_act = None
@@ -127,7 +119,7 @@ def run_one_dialog(env, pg_reinforce):
     print("Test Episode "+"-"*20)
     print("#"*30)
     cur_mode = dialog_config.RL_TRAINING
-    state = env.reset(mode=cur_mode)
+    state = env.reset(mode=cur_mode)   # user state
     total_rewards = 0
     total_t = 0
 
@@ -420,17 +412,9 @@ def load_policy_model(model_dir="model/test_nlg_no_warm_up_with_nlu.pkl"):
     net.eval()
     return net
 
-
 policy_net = load_policy_model(args.resume_rl_model_dir)
-
-
-
-# optimizer = optim.RMSprop(policy_net.parameters())
 optimizer = optim.Adam(lr=config.lr, params=policy_net.parameters(),
                                   weight_decay=5e-5)
-# net.optimizer = optim.Adam(params=net.parameters(), lr=5e-4, weight_decay=1e-3)
-# net.lr_scheduler = optim.lr_scheduler.StepLR(net.optimizer, step_size=500, gamma=0.95)
-# net.loss_func = nn.CrossEntropyLoss()
 
 pg_reinforce = PolicyGradientREINFORCE(
                      optimizer=optimizer,
@@ -451,33 +435,17 @@ pg_reinforce = PolicyGradientREINFORCE(
                      with_bit=config.with_bit,
                      replay=config.replay)
 
-
-WARM_START_EPISODES = 0#config.warm_start_episodes
+MODE = dialog_config.RL_TRAINING #dialog_config.RL_WARM_START
+WARM_START_EPISODES = 0 #config.warm_start_episodes
 MAX_EPISODES = 1
 MAX_STEPS    = 200
 TEST_EVERY = 1
 NUM_TEST = 200
-MODE = dialog_config.RL_TRAINING#dialog_config.RL_WARM_START
-import time
-import random
 
 torch.manual_seed(config.seed)
 torch.cuda.manual_seed(config.seed)
 random.seed(config.seed)
 np.random.seed(config.seed)
-
-
-
-# # # ########################## #########################
-# print(config.use_sl_simulator)
-# print(config.use_sl_generative, config.nlg_template, config.nlg_sample)
-# print(args.resume_rl_model_dir)
-# print(output_name)
-# print(config.use_new_reward)
-
-# pdb.set_trace()
-
-# # # ########################## #########################
 
 
 MAX_TEST_SUC = -1
@@ -498,8 +466,6 @@ while True:
            (((i_episode - WARM_START_EPISODES + 1) % TEST_EVERY == 0)):# or (i_episode == WARM_START_EPISODES)):
             reward_list, len_list, success_list = test(env=env, pg_reinforce=pg_reinforce, n=NUM_TEST)
             full_result = zip(reward_list, len_list, success_list)
-            # pd.DataFrame(full_result, columns=["reward", "len", "success"]).to_csv(
-            #     config.save_dir + str(cnt) + "_" + cur_time + "_full.csv", index=False)
             pd.DataFrame(full_result, columns=["reward", "len", "success"]).to_csv(
                 config.save_dir + output_name + "_full.csv", index=False)
             mean_reward_test.append(np.mean(reward_list))
@@ -510,15 +476,11 @@ while True:
         print("-" * 20)
         # initialize
         state = env.reset(mode=MODE)
-        # state = [state, env.last_usr_sent]
         total_rewards = 0
         total_t = 0
 
     # print(mean_reward_test)
     test_history = zip(test_id, mean_reward_test, mean_len_test, mean_success_test)
-
-    # pd.DataFrame(test_history, columns=["id", "reward", "len", "success"]).to_csv(
-    #     config.save_dir + str(cnt) + "_" + cur_time + ".csv", index=False)
     pd.DataFrame(test_history, columns=["id", "reward", "len", "success"]).to_csv(
         config.save_dir + output_name + ".csv", index=False)
 
@@ -526,4 +488,3 @@ while True:
         break
 
     cnt += 1
-
