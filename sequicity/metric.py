@@ -1,5 +1,7 @@
 import csv
 from collections import Counter
+import nltk
+nltk.data.path.append('/root/lyj/nltk_data')
 from nltk.util import ngrams
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize

@@ -27,7 +27,6 @@ def count_ngrams(order, vocabulary, training_sents, **counter_kwargs):
     return counter
 
 
-@compat.python_2_unicode_compatible
 class NgramModelVocabulary(Counter):
     """Stores language model vocabulary.
 
@@ -69,12 +68,10 @@ class NgramModelVocabulary(Counter):
         return self.__class__(self._cutoff, self)
 
 
-@compat.python_2_unicode_compatible
 class EmptyVocabularyError(Exception):
     pass
 
 
-@compat.python_2_unicode_compatible
 class NgramCounter(object):
     """Class for counting ngrams"""
 

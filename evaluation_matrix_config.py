@@ -7,7 +7,7 @@ class EvalConfig(object):
     resume = True
     # resume_rl_model_dir = '/home/wyshi/simulator/model/save/nlg_sample/oneHot_newReward_bitMore/0_2019-5-19-10-54-13-6-139-1.pkl'
 
-    rule_base_sys_nlu = "/data/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"
+    rule_base_sys_nlu = "./simulator/nlu_model/model/model-test-30-new.pkl"
 
 #######################################################**************
     use_sl_simulator = True
@@ -27,7 +27,7 @@ class EvalConfig(object):
     # user simulator
     nlg_sample = False
     nlg_template = True
-    csv_for_generator = '/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlg/for_generator.csv'
+    csv_for_generator = './data/multiwoz-master/data/multi-woz/nlg/for_generator.csv'
     generator_debug = True
     topk = 20
 
@@ -76,5 +76,5 @@ class EvalConfig(object):
 
     # sequicity parameters
     vocab_size = 800
-    pretrained_dir = '/data/qkun/sequicity_multiwoz_0.4/models/multiwoz_sys911.pkl'
+    pretrained_dir = './sequicity_multiwoz_0.4/models/multiwoz_sys911.pkl'
 

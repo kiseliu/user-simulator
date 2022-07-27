@@ -62,5 +62,5 @@ class Config(object):
 
     # sequicity parameters
     vocab_size = 800
-    pretrained_dir = '/data/qkun/sequicity_multiwoz_0.4/models/multiwoz_sys911.pkl'
+    pretrained_dir = './sequicity_multiwoz_0.4/models/multiwoz_sys911.pkl'
 

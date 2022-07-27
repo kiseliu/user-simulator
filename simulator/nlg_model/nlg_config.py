@@ -3,7 +3,7 @@ import pickle as pkl
 
 class Config():
     f_path = '/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlg/'
-    vector_cache_path = '/home/wyshi/simulator/data/multiwoz-master/data/multi-woz/vector_cache1'
+    vector_cache_path = '/root/lyj/glove.6B/'
     # feature_name = ['utt']
     # label_name = 'y'
     use_gpu = False#torch.cuda.is_available()

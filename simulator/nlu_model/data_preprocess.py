@@ -1,16 +1,12 @@
 import pandas as pd
 import numpy as np
-import numpy as np
-import re
-import logging
 import re
 import sys
 
 print(sys.path)
 import spacy
-from sklearn.metrics import f1_score, precision_score, classification_report, hamming_loss, recall_score
 
-spacy_en = spacy.load('en')
+spacy_en = spacy.load('en_core_web_sm')
 import torch
 import torch.nn as nn
 from torch.nn import init
@@ -333,7 +329,7 @@ class DataProcessor(object):
 
     def _build_labelEncoder(self):
         from sklearn.preprocessing import LabelEncoder
-        with open('/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlu/labelEncoder.pkl', 'rb') as fh:
+        with open('./data/multiwoz-master/data/multi-woz/nlu/labelEncoder.pkl', 'rb') as fh:
             self.le = pkl.load(fh)
         self.df['y'] = self.le.fit_transform(self.df[config.label_name])
 

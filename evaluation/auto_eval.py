@@ -2,7 +2,7 @@
 #
 import sys, os, pdb, re
 import nltk
-sys.path.append('/data/qkun/simulator/data/multiwoz-master/data')
+sys.path.append('./data/multiwoz-master/data')
 from usr_action_classify import classify_sent
 from delex_sent import delex_sent
 from collections import defaultdict
@@ -29,7 +29,7 @@ class auto_eval(object):
 
         self.delex_usr_utt = self._delex_file()
 
-        self.test_file_path = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/restaurant.csv'
+        self.test_file_path = './data/multiwoz-master/data/multi-woz/restaurant.csv'
 
         self.test_file = self._extract_test_file(self.test_file_path)
 
@@ -160,7 +160,7 @@ def main():
     #     # pdb.set_trace()
     #     act_tmp.write(' '.join([str(n) for n in usr_act_dist.values()]) + '\n')
     # act_tmp.close()
-    # path = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/restaurant_non_delex_no_newline.csv'
+    # path = './data/multiwoz-master/data/multi-woz/restaurant_non_delex_no_newline.csv'
     # Eval = auto_eval(path)
     # usr_act_dist = Eval.usr_act_dist()
     # print(usr_act_dist, '\n')

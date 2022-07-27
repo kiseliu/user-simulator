@@ -85,14 +85,14 @@ class _Config:
         self.result_path = './results/multiwoz_sys.csv'
         self.vocab_path = './vocab/vocab-multiwoz_sys.pkl'
 
-        self.data = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_sys.json'
-        self.entity = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_OTGY.json'
-        self.db = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json'
+        self.data = './data/multiwoz-master/data/multi-woz/rest_sys.json'
+        self.entity = './data/multiwoz-master/data/multi-woz/rest_OTGY.json'
+        self.db = './data/multiwoz-master/data/multi-woz/restaurant_db.json'
 
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '/data/qkun/sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.dropout_rate = 0.5
@@ -130,24 +130,24 @@ class _Config:
         # self.result_path = './results/multi_woz_simulator911_goal.csv'
         # self.vocab_path = './vocab/vocab-multi_woz_simulator911_goal.pkl'
 
-        # self.data = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_usr_simulator.json'
+        # self.data = './data/multiwoz-master/data/multi-woz/rest_usr_simulator.json'
         # self.entity = './data/multi_woz/rest_OTGY.json'
-        # self.db = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json'
+        # self.db = './data/multiwoz-master/data/multi-woz/restaurant_db.json'
 
 
         self.split = (9, 1, 1)
-        self.root_dir = "/data/qkun/sequicity_multiwoz_0.4"
+        self.root_dir = "./sequicity_multiwoz_0.4"
         self.model_path = self.root_dir + '/models/multi_woz_simulator911_goalkey.pkl'
         self.result_path = self.root_dir + '/results/multi_woz_simulator911_goalkey.csv'
         self.vocab_path = self.root_dir + '/vocab/vocab-multi_woz_simulator911_goalkey.pkl'
 
-        self.data = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_usr_simulator_goalkey.json'
-        self.entity = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_OTGY.json'
-        self.db = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json'
+        self.data = './data/multiwoz-master/data/multi-woz/rest_usr_simulator_goalkey.json'
+        self.entity = './data/multiwoz-master/data/multi-woz/rest_OTGY.json'
+        self.db = './data/multiwoz-master/data/multi-woz/restaurant_db.json'
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '/data/qkun/sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.dropout_rate = 0.5
         self.epoch_num = 100 # triggered by early stop
@@ -178,18 +178,18 @@ class _Config:
         self.degree_size = 1
 
         self.split = (9, 1, 1)
-        self.root_dir = "/data/qkun/sequicity_multiwoz_0.4"
+        self.root_dir = "./sequicity_multiwoz_0.4"
         self.model_path = self.root_dir + '/models/multi_woz_simulator911_act.pkl'
         self.result_path = self.root_dir + '/results/multi_woz_simulator911_act.csv'
         self.vocab_path = self.root_dir + '/vocab/vocab-multi_woz_simulator911_act.pkl'
 
-        self.data = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_usr_simulator_act.json'
-        self.entity = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_OTGY.json'
-        self.db = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json'
+        self.data = './data/multiwoz-master/data/multi-woz/rest_usr_simulator_act.json'
+        self.entity = './data/multiwoz-master/data/multi-woz/rest_OTGY.json'
+        self.db = './data/multiwoz-master/data/multi-woz/restaurant_db.json'
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '/data/qkun/sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.dropout_rate = 0.5
         self.epoch_num = 100 # triggered by early stop

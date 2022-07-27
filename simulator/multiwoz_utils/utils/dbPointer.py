@@ -9,7 +9,7 @@ from simulator.multiwoz_utils.utils.nlp import normalize
 domains = ['restaurant', 'hotel', 'attraction', 'train', 'taxi', 'hospital']#, 'police']
 dbs = {}
 for domain in domains:
-    db = '/data/wyshi/simulator/data/multiwoz-master/db/{}-dbase.db'.format(domain)
+    db = './data/multiwoz-master/db/{}-dbase.db'.format(domain)
     conn = sqlite3.connect(db)
     c = conn.cursor()
     dbs[domain] = c

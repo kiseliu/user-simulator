@@ -9,8 +9,12 @@
 /model/*
 /data/results/*
 /simulator/nlg_model/seq2seq/*
+/sequicity/log/*
+/sequicity_user/log/*
+/sequicity_user/results/*
 /data/*
 /human_evaluation/*
 data/multiwoz-master/data/multi-woz/data.json
 data/multiwoz-master/data/multi-woz/delex.json
 /test/*    # parlai
+evaluation/*

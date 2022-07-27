@@ -2,8 +2,8 @@
 #
 import sys, os, re, pdb
 # sys.path.append('/home/wyshi/simulator/sequcity_user/')
-# sys.path.append('/data/qkun/sequcity_mulitwoz_0.4/')
-sys.path.append('/home/wyshi/simulator/')
+# sys.path.append('./sequcity_mulitwoz_0.4/')
+sys.path.append('./')
 import logging, random
 import torch
 import numpy as np

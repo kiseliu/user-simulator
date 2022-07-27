@@ -5,9 +5,9 @@ import os, sys
 
 class Config(object):
     resume = True
-    resume_rl_model_dir = '/data/wyshi/simulator/model/save/sl_simulator/oneHot_oldReward_bitMore/best/0_2019-5-19-3-27-15-6-139-1.pkl'
+    resume_rl_model_dir = './model/save/sl_simulator/oneHot_oldReward_bitMore/best/0_2019-5-19-3-27-15-6-139-1.pkl'
 
-    rule_base_sys_nlu = "/data/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"
+    rule_base_sys_nlu = "./simulator/nlu_model/model/model-test-30-new.pkl"
 
     use_sl_simulator = True
     use_sl_generative = True
@@ -20,13 +20,13 @@ class Config(object):
     # user simulator
     nlg_sample = False
     nlg_template = False
-    csv_for_generator = '/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/nlg/for_generator.csv'
+    csv_for_generator = './data/multiwoz-master/data/multi-woz/nlg/for_generator.csv'
     generator_debug = True
     topk = 20
 
     # rl
     n_episodes = 30000
-    save_dir = '/data/wyshi/simulator/model/save/sl_simulator/oneHot_oldReward_bitMore/' # save_dir = '/home/wyshi/simulator/model/save/sl_simulator/retrieval/oneHot_oldReward_bitMore/'#'/home/wyshi/simulator/model/save/sl_simulator/generative/oneHot_oldReward_bitMore/'
+    save_dir = './model/save/sl_simulator/oneHot_oldReward_bitMore/' # save_dir = '/home/wyshi/simulator/model/save/sl_simulator/retrieval/oneHot_oldReward_bitMore/'#'/home/wyshi/simulator/model/save/sl_simulator/generative/oneHot_oldReward_bitMore/'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     use_sequicity_for_rl_model = False
@@ -69,5 +69,5 @@ class Config(object):
 
     # sequicity parameters
     vocab_size = 800
-    pretrained_dir = '/data/qkun/sequicity_multiwoz_0.4/models/multiwoz_sys911.pkl'
+    pretrained_dir = './sequicity_multiwoz_0.4/models/multiwoz_sys911.pkl'
 

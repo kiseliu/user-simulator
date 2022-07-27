@@ -8,7 +8,7 @@ timepat = re.compile("\d{1,2}[:]\d{1,2}")
 pricepat = re.compile("\d{1,3}[.]\d{1,2}")
 
 
-with open('/data/wyshi/simulator/simulator/multiwoz_utils/utils/mapping.pair', "r") as fin:
+with open('./simulator/multiwoz_utils/utils/mapping.pair', "r") as fin:
 #fin = file('simulator/multiwoz_utils/utils/mapping.pair')
     replacements = []
     for line in fin.readlines():

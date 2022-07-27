@@ -62,22 +62,22 @@ class _Config:
         # self.result_path = './results/multi_woz_simulator.csv'
         # self.vocab_path = './vocab/vocab-multi_woz_simulator.pkl'
 
-        # self.data = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_usr_simulator.json'
+        # self.data = './data/multiwoz-master/data/multi-woz/rest_usr_simulator.json'
         # self.entity = './data/multi_woz/ontology.json'
         # self.db = './data/multi_woz/restaurant_db.json'
 
         self.split = (9, 1, 1)
-        self.model_path = '/data/qkun/sequicity_multiwoz_0.4/' + 'models/multiwoz_sys_test.pkl'
+        self.model_path = './sequicity_multiwoz_0.4/' + 'models/multiwoz_sys_test.pkl'
         self.result_path = self.root_dir + 'results/multiwoz_sys.csv'
-        self.vocab_path = '/data/qkun/sequicity_multiwoz_0.4/' + 'vocab/vocab-multiwoz_sys.pkl'
+        self.vocab_path = './sequicity_multiwoz_0.4/' + 'vocab/vocab-multiwoz_sys.pkl'
 
-        self.data = '/data/qkun/simulator/data/multiwoz-master/data/multi-woz/rest_sys.json'
+        self.data = './data/multiwoz-master/data/multi-woz/rest_sys.json'
         self.entity = self.root_dir + 'data/multi_woz/ontology.json'
-        self.db = '/data/qkun/simulator/data/multiwoz-master/' + 'data/multi-woz/restaurant_db.json'
+        self.db = './data/multiwoz-master/' + 'data/multi-woz/restaurant_db.json'
 
 
 
-        self.glove_path = '/data/qkun/sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.z_length = 12
         self.degree_size = 5
@@ -113,7 +113,7 @@ class _Config:
         self.dev = self.root_dir + 'data/kvret/kvret_dev_public.json'
         self.test = self.root_dir + 'data/kvret/kvret_test_public.json'
         self.entity = self.root_dir + 'data/kvret/kvret_entities.json'
-        self.glove_path = '/data/qkun/sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.z_length = 8

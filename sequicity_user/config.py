@@ -136,7 +136,7 @@ class _Config:
 
 
         self.split = (9, 1, 1)
-        self.root_dir = "/data/qkun/sequicity_multiwoz_0.4"
+        self.root_dir = "./sequicity_multiwoz_0.4"
         self.model_path = self.root_dir + '/models/multi_woz_simulator911_goal.pkl'
         self.result_path = self.root_dir + '/results/multi_woz_simulator911_goal.csv'
         self.vocab_path = self.root_dir + '/vocab/vocab-multi_woz_simulator911_goal.pkl'
@@ -178,7 +178,7 @@ class _Config:
         self.degree_size = 1
 
         self.split = (9, 1, 1)
-        self.root_dir = "/data/qkun/sequicity_multiwoz_0.4"
+        self.root_dir = "./sequicity_multiwoz_0.4"
         self.model_path = self.root_dir + '/models/multi_woz_simulator911_act3.pkl'
         self.result_path = self.root_dir + '/results/multi_woz_simulator911_act.csv'
         self.vocab_path = self.root_dir + '/vocab/vocab-multi_woz_simulator911_act3.pkl'

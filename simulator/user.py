@@ -16,16 +16,6 @@ from copy import deepcopy
 from seq2seq_nlg import sample as Seq2Seq_nlg
 cur_dir = os.getcwd()
 
-# area, food, pricerange, phone, address, postcode, name
-# with open(os.path.join(cur_dir, "data/cambridge_data/state_by_slots_no_dontcare_improved"), "rb") as fh:
-#     slots_by_state = pkl.load(fh)
-
-data_dir = "data/multiwoz-master/data/multi-woz/"
-with open("/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json", "rb") as fh:
-    DB = json.load(fh)
-
-
-
 actionID_to_template = {
     0: "thank you for using our system, goodbye .", # arrival
     1: "do you have a [slot_food] preference ?", # departure
@@ -48,13 +38,19 @@ STATE_TO_SENTS[7] = "i am looking for a restaurant, food, price, /sorry, no matc
 STATE_TO_SENTS[8] = "thank you bye"
 STATE_TO_SENTS[9] = "i am looking for a restaurant, food, price"
 
+# area, food, pricerange, phone, address, postcode, name
+# with open(os.path.join(cur_dir, "data/cambridge_data/state_by_slots_no_dontcare_improved"), "rb") as fh:
+#     slots_by_state = pkl.load(fh)
+
+data_dir = "./data/multiwoz-master/data/multi-woz/"
+with open("./data/multiwoz-master/data/multi-woz/restaurant_db.json", "rb") as fh:
+    DB = json.load(fh)
 
 # EeNTITY_POOL = {'food': ['dont_care', 'chinese', 'american'],
 #                'area': ['dont_care', 'west', 'east'],
 #                'pricerange': ['dont_care', 'moderate', 'expensive']}
-import pandas as pd
-# DB = pd.read_csv(os.path.join(cur_dir, "data/NNDIAL-master/db/CamRest.csv"))
-with open("/data/wyshi/simulator/data/NNDIAL-master/db/ENTITY_POOL_no_dontcare.pkl", "rb") as fh:
+
+with open("./data/multiwoz-master/ENTITY_POOL_no_dontcare.pkl", "rb") as fh:
     ENTITY_POOL = pkl.load(fh)
 INITIAL_STATE = random.choice([6, 7, 9], size=1)[0]
 
@@ -62,10 +58,10 @@ INITIAL_STATE = random.choice([6, 7, 9], size=1)[0]
 class Goal(object):
     def __init__(self, mturker=True):
         if mturker:
-            with open(data_dir + "detailed_goals.pkl", "rb") as fh:
+            with open(data_dir + "goal/detailed_goals.pkl", "rb") as fh:
                 self.goal_pool = pkl.load(fh)
         else:
-            with open(data_dir + "detailed_goals_augmented.pkl", "rb") as fh:
+            with open(data_dir + "goal/detailed_goals_augmented.pkl", "rb") as fh:
                 self.goal_pool = pkl.load(fh)
 
         self.entity_type = {
@@ -77,19 +73,6 @@ class Goal(object):
 
     def _intersection(self, lst1, lst2):
         return list(set(lst1) & set(lst2))
-
-    # def query_in_DB(self, cur_info):
-    #     match_list = []
-    #     for restaurant in self.DB:
-    #         match = True
-    #         for entity, value in cur_info.items():
-    #             # assert type(value) == type(value[0])
-    #             # assert isinstance(value, list)
-    #             if restaurant[entity] != value:
-    #                 match = False
-    #         if match:
-    #             match_list.append(restaurant)
-    #     return match_list
 
     def query_in_DB(self, cur_info, skip=[]):
         match_list = []
@@ -345,63 +328,32 @@ class Goal(object):
 
         return final_sents
 
-"""
-tmp_sents = []
-tmp_goals = []
-book_goal = []
-goal_generator = Goal()
-for goal in augmented_goals: #goal_generator.goal_pool:
-    tmp_goal, _ = goal_generator.generate_initial_goal(goal)
-    tmp_goals.append(tmp_goal)
-    if 'cur_book' in tmp_goal:
-        book_goal.append(goal)
-    tmp_sents.append(goal_generator.generate_templates(tmp_goal))
-
-augmented_goals = goal_generator.goal_pool + book_goal
-import numpy as np
-np.random.seed(0)
-np.random.shuffle(augmented_goals)
-
-    with open(data_dir + "detailed_goals_augmented.pkl", "wb") as fh:
-        pkl.dump(augmented_goals, fh)
-
-
-cnt_req = []
-cnt_book = []
-for i, g in enumerate(tmp_goals):
-    if 'cur_book' in g:
-        cnt_book.append(i)
-    if 'reqt' in g:
-        cnt_req.append(i)
-    
-
-
-import pandas as pd
-pd.Series(tmp_sents).to_csv(data_dir+"tmp_goals.csv", encoding='utf-8')
-"""
 
 #TODO the second query?, "dont_care" value
 class User(object):
     ## class DialogState(object):
     def __init__(self, nlg_sample, nlg_template, clean_prob=0.95,
                  transition_prob=None, slots_by_state=None):
-        with open(data_dir + "detailed_goals_augmented.pkl", "rb") as fh:
+        with open(data_dir + "goal/detailed_goals_augmented.pkl", "rb") as fh:
             self.goal_pool = pkl.load(fh)
         self.goal_generator = Goal(mturker=False)
         self.DB = DB
         self.nlg_sample = nlg_sample
         self.nlg_template = nlg_template
         if self.nlg_sample:
-            with open("/data/wyshi/simulator/data/multiwoz-master/data/multi-woz/act_to_utt_dict_modified.pkl", "rb") as fh:
+            with open("./data/multiwoz-master/data/multi-woz/act_to_utt_dict_modified.pkl", "rb") as fh:
                 self.nlg_templates = pkl.load(fh)
             self.generator = retrieval_generator()
+            self.name = 'US-AgenR'
         else:
             self.generator = None
             self.nlg_templates = None
             if not nlg_template:
                 self.seq2seq = Seq2Seq_nlg
+                self.name = 'US-AgenG'
             else:
                 self.seq2seq = None
+                self.name = 'US-AgenT'
         self.entity_type = {
             "informable_slots": dialog_config.informable_slots,
             "requestable_slots": dialog_config.requestable_slots,
@@ -467,6 +419,7 @@ class User(object):
         goal, goal_templates = self.goal_generator.generate_initial_goal()
         self.goal = goal
         self._set_initial_state()
+        self.fail_reason = ''
 
     def _set_initial_goal(self, total_query_p=[1, 0, 0.0]):
         """
@@ -536,19 +489,6 @@ class User(object):
 
                 tmp_goal['cur_book'] = deepcopy(tmp_goal['book_first_choice'])
 
-                # tmp_goal['book'] = {k: [v] for k, v in first_choice.items()}
-                # tmp_goal['fail_book'] = {k: [v] for k, v in first_choice.items()}
-                # for k, v in second_choice.items():
-                #     tmp_goal['fail_book'][k] = [v]  #
-
-                # for k, v in second_choice.items():
-                #     if v not in tmp_goal['book'][k]:
-                #         tmp_goal['book'][k].append(v)
-
-        # if ('info_first_choice' in tmp_goal) or ('info_second_choice' in tmp_goal):
-        #     tmp_goal['first_choice_match'] = len(self.query_in_DB(tmp_goal['info_first_choice']))
-        #     tmp_goal['second_choice_match'] = len(self.query_in_DB(tmp_goal['info_second_choice']))
-        # else:
         tmp_goal['first_choice_match'] = len(self.query_in_DB(tmp_goal['cur_info']))
 
         # assert len(tmp_goal) == 2 # (info, book) or (info, request)
@@ -585,19 +525,6 @@ class User(object):
         self.check_info = dialog_config.INFO_CHECK_NOTYET
         self.check_reservation = []#dialog_config.RESERVATION_CHECK_NOTYET
         self.dialog_status = dialog_config.NO_OUTCOME_YET
-
-    # def query_in_DB(self, cur_info):
-    #     match_list = []
-    #     for restaurant in self.DB:
-    #         match = True
-    #         for entity, value in cur_info.items():
-    #             # assert type(value) == type(value[0])
-    #             # assert isinstance(value, list)
-    #             if restaurant[entity] != value:
-    #                 match = False
-    #         if match:
-    #             match_list.append(restaurant)
-    #     return match_list
 
     def query_in_DB(self, cur_info, skip=[]):
         match_list = []
@@ -763,8 +690,6 @@ class User(object):
         if len(self.state['sys_act_sequence']) >= self.max_turn and usr_act.act != UserAct.GOODBYE:
             print("Maximum dialog length reached!")
             self.dialog_status = dialog_config.FAILED_DIALOG
-
-
         return usr_act
 
     def check_presented_result(self, match):
@@ -956,9 +881,6 @@ class User(object):
             params = None
             # update states
             self.state['asked_anything_else'] += 1
-
-
-
         return Action(selected_action, params)
 
     def response_NO_OTHER(self, sys_act):
@@ -1115,9 +1037,6 @@ class User(object):
             if sys_act_str not in [SystemAct.GOODBYE]:
                 self.dialog_status = dialog_config.FAILED_DIALOG
 
-
-
-
     def evaluate_GOOD_BYE(self, sys_act):
         # success conditions: 1) present correct restaurant 2) present correct info/ try to make a reservation
         # failure conditions: 1) check_constrain = FALSE (the result presented is incorrect)
@@ -1220,6 +1139,7 @@ class User(object):
         if sys_act is not None:
             self.state['sys_act_sequence'].append(sys_act.act)
         usr_act = self.rule_policy(sys_act=sys_act)
+        print('------sys_act = ', sys_act, ' prev_sys = ', prev_sys, ' usr_act.act = ', usr_act.act)
         self.state['usr_act_sequence'].append(usr_act.act)
         # print(usr_act)
         if self.nlg_sample:
@@ -1231,18 +1151,18 @@ class User(object):
                                                                             generator=self.generator, context=prev_sys,
                                                                             seq2seq=None)
         else:
-            if self.seq2seq is None:
-                assert self.nlg_template
+            if self.seq2seq is None:   # retrieval
                 assert not self.nlg_sample
+                assert self.nlg_template
                 assert self.generator is None
                 usr_response_sent, lexicalized_usr_act = self.nlg.generate_sent(usr_act,
                                                                                 turn_num=(len(self.state['usr_act_sequence'])-1),
                                                                                 generator=None,
                                                                                 seq2seq=None)
             else:
+                assert self.seq2seq
                 assert not self.nlg_sample
                 assert not self.nlg_template
-                assert self.seq2seq
                 print("rule-based seq2seq")
                 usr_response_sent, lexicalized_usr_act = self.nlg.generate_sent(usr_act,
                                                            generator=None,
@@ -1252,325 +1172,6 @@ class User(object):
         return usr_act, usr_response_sent
 
 
-"""
-    def generate_one_goal_entity(self):
-
-        goal = {'food': None,
-                'area': None,
-                'pricerange': None,
-                'address': None,
-                'postcode': None,
-                'phone': None}
-
-        goal['food'] = random.choice(self.entity_pool['food'], size=1)[0]
-        goal['area'] = random.choice(self.entity_pool['area'], size=1)[0]
-        goal['pricerange'] = random.choice(self.entity_pool['pricerange'], size=1)[0]
-        goal['address'] = random.choice([0, 1], size=1)[0] # 0/1, ask for address or not
-        goal['postcode'] = random.choice([0, 1], size=1)[0] # 0/1, ask or not
-        goal['phone'] = random.choice([0, 1], size=1)[0] # 0/1, ask or not
-
-        return goal
-
-    def agenda_response(self, system_utt, dialog_state):
-        queryable = dialog_state['informable_slots']['food'] and dialog_state['informable_slots']['area'] \
-                    and dialog_state['informable_slots']['pricerange']
-        if self.response_history:
-            last_question_about_address = "slot_address" in self.response_history[-1] or "slot_postcode" in self.response_history[-1]\
-                        or "slot_phone" in self.response_history
-        if system_utt == "do you have a [slot_food] preference ?":
-            if last_question_about_address and dialog_state['match_presented'] > 0:
-                return ["ERROR, I asked for the information but you didn't answer me!"]
-            else:
-                if dialog_state['informable_slots']['food'] == 0:
-                    return [4]
-                else:
-                    return ["MINOR_ERROR, you already know food"]
-        elif system_utt == "do you have a [slot_area] preference ?":
-            if last_question_about_address and dialog_state['match_presented'] > 0:
-                return ["ERROR, I asked for the information but you didn't answer me!"]
-            else:
-                if dialog_state['informable_slots']['area'] == 0:
-                    return [4]
-                else:
-                    return ["MINOR_ERROR, you already know area"]
-        elif system_utt == "do you have a [slot_pricerange] preference ?":
-            if last_question_about_address and dialog_state['match_presented'] > 0:
-                return ["ERROR, I asked for the information but you didn't answer me!"]
-            else:
-                if dialog_state['informable_slots']['pricerange'] == 0:
-                    return [4]
-                else:
-                    return ["MINOR_ERROR, you already know pricerange"]
-
-        elif system_utt == \
-                "I am sorry, but there are no restaurants matching your request. Is there anything else I can help you with?":
-            if last_question_about_address and dialog_state['match_presented'] > 0:
-                return ["ERROR, I asked for the information but you didn't answer me!"]
-            else:
-                if queryable: # queryable
-                    if dialog_state['match_presented'] >= self.goal['match_nums'][0]:
-                        if dialog_state['no_match_presented'] == 1:
-                            return [0, 5, 8]
-                        else:
-                            return ["ERROR, I already know there is no match!"]
-                    else:
-                        return ["ERROR, there is at least one more match!"]
-                else:
-                    return ["ERROR, you don't have enough entities to make a query!"]
-
-        elif system_utt == \
-            "[value_name] is a good restaurant matching your request. Is there anything else I can help you with?":
-            if last_question_about_address and dialog_state['match_presented'] > 0:
-                return ["ERROR, I asked for the information but you didn't answer me!"]
-            else:
-                if queryable:
-                    if dialog_state['match_presented'] <= self.goal['match_nums'][0]:
-                        return [0, 1, 2, 3, 5, 8]
-                    else:
-                        return ["ERROR, you actually run out of results!"]
-                else:
-                    return ["ERROR, you don't have enough entities to make a query!"]
-
-        elif system_utt == \
-            "[value_name] is located at [value_address] . its [slot_phone] is [value_phone] and the [slot_postcode] is [value_postcode] . is there anything else i can help you with ?":
-            if dialog_state['match_presented'] + dialog_state['no_match_presented'] > 0:
-                asked_for_info = dialog_state['requestable_slots_asked']['address'] == 1 \
-                     or dialog_state['requestable_slots_asked']['phone'] == 1 \
-                     or dialog_state['requestable_slots_asked']['postcode'] == 1
-                info_provided = dialog_state['requestable_slots_provided']['address'] == 1 \
-                     or dialog_state['requestable_slots_provided']['phone'] == 1 \
-                     or dialog_state['requestable_slots_provided']['postcode'] == 1
-                if asked_for_info and info_provided:
-                    return [0, 5, 8]
-                elif not asked_for_info and info_provided:
-                    return ["ERROR, I haven't asked for the information"]
-                elif asked_for_info and not info_provided:
-                    return ["ERROR, you haven provided the info"]
-                else:
-                    return ["ERROR, this is out of no where!"]
-            else:
-                return ["ERROR, you haven't presented any result yet!"]
-        elif system_utt == "thank you for using our system, goodbye .":
-            return ["ERROR, you are not supposed to end the conversation!"]
-        return ["ERROR"]
-
-
-
-    def sample_response(self, system_utt, dialog_state, available_sents):
-
-        def get_sample_from_slots(ok_slots):
-            possible_sents = []
-            for s in ok_slots:
-                possible_sents += available_sents[s]
-            if possible_sents:
-                return [random.choice(possible_sents, size=1)[0]]
-            else:
-                return self.agenda_response(system_utt, dialog_state)
-
-        available_slots = available_sents.keys()
-        queryable = dialog_state['informable_slots']['food'] and dialog_state['informable_slots']['area'] \
-                    and dialog_state['informable_slots']['pricerange']
-        if self.response_history:
-            last_question_about_address = "slot_address" in self.response_history[-1] or "slot_postcode" in self.response_history[-1]\
-                        or "slot_phone" in self.response_history
-        if self.first_utt:
-            possible_slots = [tmp_s for tmp_s in available_slots if "value_pricerange" in tmp_s\
-                              or "value_area" in tmp_s or "value_food" in tmp_s]
-            self.first_utt = False
-            return get_sample_from_slots(possible_slots)
-        else:
-            if system_utt == "do you have a [slot_food] preference ?":
-                if last_question_about_address and dialog_state['match_presented'] > 0:
-                    return ["ERROR, I asked for the information but you didn't answer me!"]
-                else:
-                    if dialog_state['informable_slots']['food'] == 0:
-                        possible_slots = [tmp_s for tmp_s in available_slots if "value_food" in tmp_s]
-                        return get_sample_from_slots(possible_slots)
-                    else:
-                        return ["MINOR_ERROR, you already know food"]
-            elif system_utt == "do you have a [slot_area] preference ?":
-                if last_question_about_address and dialog_state['match_presented'] > 0:
-                    return ["ERROR, I asked for the information but you didn't answer me!"]
-                else:
-                    if dialog_state['informable_slots']['area'] == 0:
-                        possible_slots = [tmp_s for tmp_s in available_slots if "value_area" in tmp_s]
-                        return get_sample_from_slots(possible_slots)
-                    else:
-                        return ["MINOR_ERROR, you already know area"]
-            elif system_utt == "do you have a [slot_pricerange] preference ?":
-                if last_question_about_address and dialog_state['match_presented'] > 0:
-                    return ["ERROR, I asked for the information but you didn't answer me!"]
-                else:
-                    if dialog_state['informable_slots']['pricerange'] == 0:
-                        possible_slots = [tmp_s for tmp_s in available_slots if "value_pricerange" in tmp_s]
-                        return get_sample_from_slots(possible_slots)
-                    else:
-                        return ["MINOR_ERROR, you already know pricerange"]
-
-            elif system_utt == \
-                    "I am sorry, but there are no restaurants matching your request. Is there anything else I can help you with?":
-                if last_question_about_address and dialog_state['match_presented'] > 0:
-                    return ["ERROR, I asked for the information but you didn't answer me!"]
-                else:
-                    if queryable: # queryable
-                        if dialog_state['match_presented'] >= self.goal['match_nums'][0]:
-                            if dialog_state['no_match_presented'] == 1:
-                                possible_slots = [tmp_s for tmp_s in available_slots if "end" in tmp_s]
-                                return get_sample_from_slots(possible_slots)
-                            else:
-                                return ["ERROR, I already know there is no match!"]
-                        else:
-                            return ["ERROR, there is at least one more match!"]
-                    else:
-                        return ["ERROR, you don't have enough entities to make a query!"]
-
-            elif system_utt == \
-                "[value_name] is a good restaurant matching your request. Is there anything else I can help you with?":
-                if last_question_about_address and dialog_state['match_presented'] > 0:
-                    return ["ERROR, I asked for the information but you didn't answer me!"]
-                else:
-                    if queryable:
-                        if dialog_state['match_presented'] <= self.goal['match_nums'][0]:
-                            possible_slots = [tmp_s for tmp_s in available_slots if "end" in tmp_s or "else" in tmp_s \
-                                              or "slot_address" in tmp_s or "slot_phone" in tmp_s or "slot_postcode" in tmp_s]
-                            return get_sample_from_slots(possible_slots)
-                            # return [0, 1, 2, 3, 5, 8]
-                        else:
-                            return ["ERROR, you actually run out of results!"]
-                    else:
-                        return ["ERROR, you don't have enough entities to make a query!"]
-
-            elif system_utt == \
-                "[value_name] is located at [value_address] . its [slot_phone] is [value_phone] and the [slot_postcode] is [value_postcode] . is there anything else i can help you with ?":
-                if dialog_state['match_presented'] + dialog_state['no_match_presented'] > 0:
-                    asked_for_info = dialog_state['requestable_slots_asked']['address'] == 1 \
-                         or dialog_state['requestable_slots_asked']['phone'] == 1 \
-                         or dialog_state['requestable_slots_asked']['postcode'] == 1
-                    info_provided = dialog_state['requestable_slots_provided']['address'] == 1 \
-                         or dialog_state['requestable_slots_provided']['phone'] == 1 \
-                         or dialog_state['requestable_slots_provided']['postcode'] == 1
-                    if asked_for_info and info_provided:
-                        possible_slots = [tmp_s for tmp_s in available_slots if "end" in tmp_s]
-                        return get_sample_from_slots(possible_slots)
-                        # return [0, 5, 8]
-                    elif not asked_for_info and info_provided:
-                        return ["ERROR, I haven't asked for the information"]
-                    elif asked_for_info and not info_provided:
-                        return ["ERROR, you haven provided the info"]
-                    else:
-                        return ["ERROR, this is out of no where!"]
-                else:
-                    return ["ERROR, you haven't presented any result yet!"]
-            elif system_utt == "thank you for using our system, goodbye .":
-                return ["ERROR, you are not supposed to end the conversation!"]
-            return ["ERROR"]
-
-
-    def sample_from(self, last_state, dialog_state, system_utt):
-
-        next_state = random.choice(10, size=1, p=self.transition_prob[last_state])[0]
-        response = self.sample_from_one_turn(next_state, dialog_state, system_utt)
-
-        self.states_series.append(next_state)
-        return response
-
-    def sample_from_one_turn(self, state, dialog_state, system_utt):
-        # dialog_state = {
-        # "informable_slots": {"food":,
-        #                      "area":,
-        #                      "pricerange"},
-        # "requestable_slots": {"address":
-        #                   "phone":
-        #                   "postcode"}
-        # "presented": (0, haven't presented yet; 1, match; -1, no match)
-        # "left_query":
-        # }
-        informable_slots = ["food", "area", "pricerange"]
-        if not self.is_sample:
-            if self.first_utt:
-                entity_bit = random.choice(2, size=3)
-                entity_provide = ["value_"+informable_slots[i] for i, e in enumerate(entity_bit) if e]
-                response = " ".join(["I am looking for a restaurant, "] + entity_provide)
-                self.first_utt = False
-            else:
-                if state == 4:
-                    response = ""
-                    if "slot_food" in system_utt:
-                        response = "value_food"
-                    if "slot_area" in system_utt:
-                        response = "value_area"
-                    if "slot_pricerange" in system_utt:
-                        response = "value_pricerange"
-                else:
-                    response = STATE_TO_SENTS[state]
-                agenda_state = self.agenda_response(system_utt, dialog_state)
-                if type(agenda_state[0]) is int:
-                    # altered_response = response
-                    if state not in agenda_state:
-                        altered_response = "$altered$"
-                        agenda_state_tmp = random.choice(agenda_state, size=1)[0]
-                        if agenda_state_tmp == 4:
-                            if "slot_food" in system_utt:
-                                altered_response = "$altered$ value_food"
-                            if "slot_area" in system_utt:
-                                altered_response = "$altered$ value_area"
-                            if "slot_pricerange" in system_utt:
-                                altered_response = "$altered$ value_pricerange"
-                        else:
-                            altered_response = "$altered$ " + STATE_TO_SENTS[agenda_state_tmp]
-                        response = altered_response
-                    else:
-                        response = "$non-altered$ " + response
-                else: # error message
-                    response = agenda_state[0]
-                    if "MINOR_ERROR" in response:
-                        self.done = False
-                        self.success = None
-                    else:
-                        self.done = True
-                        self.success = False
-        else:
-            available_sents = self.slots_by_state[state]
-            response = self.sample_response(system_utt, dialog_state, available_sents)
-
-            if type(response[0]) is int: # ran out of sample, went to agenda_response
-                altered_response = "$altered, run out of sample$"
-                agenda_state_tmp = random.choice(response, size=1)[0]
-                if agenda_state_tmp == 4:
-                    if "slot_food" in system_utt:
-                        altered_response = "$altered, run out of sample$ value_food"
-                    if "slot_area" in system_utt:
-                        altered_response = "$altered, run out of sample$ value_area"
-                    if "slot_pricerange" in system_utt:
-                        altered_response = "$altered, run out of sample$ value_pricerange"
-                else:#
-                    altered_response = "$altered, run out of sample$ " + STATE_TO_SENTS[agenda_state_tmp]
-                response = altered_response
-
-            else:
-                response = response[0]
-                if "MINOR_ERROR" in response: # error message
-                    self.done = False
-                    self.success = None
-                elif "ERROR" in response:
-                #if "ERROR" in response:
-                    self.done = True
-                    self.success = False
-
-
-        if ("thank" in response or "bye" in response) and self.success is None:
-            if dialog_state['match_presented'] + dialog_state['no_match_presented'] > 0:
-                self.success = True
-                self.done = True
-            else:
-                self.success = False
-                self.done = True
-        return response
-
-"""
-
 if __name__ == "__main__":
     user = User()
     goal = Goal()
-
-
