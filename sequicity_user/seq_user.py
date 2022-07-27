@@ -27,7 +27,7 @@ class Seq_User(User):
         # # # # # # # # # # # # # # # # 
         # # model configure setting # #
 
-        device = torch.device("cuda:4" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         cfg.init_handler('tsdf-usr')
         cfg.dataset = 'usr'
         if cfg.cuda:
@@ -150,15 +150,8 @@ class Seq_User(User):
         filled_usr, slot_dic = self.fill_sentence(cur_usr)
 
         if turn_num != 0:
-            # pdb.set_trace()
             self.success_or_not(self.prev_m, prev_sys, filled_usr, sys_act)
         self.update_states_from_user(filled_usr)
-
-        # ##############################
-        # pdb.set_trace()
-        # ################################
-
-
 
         self.prev_z = z_idx
         self.prev_m = filled_usr

@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/wyshi/simulator")
+sys.path.append("./")
 from simulator.user import User, Goal
 from simulator.system import System
 from simulator.env import Enviroment

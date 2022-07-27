@@ -1,5 +1,7 @@
 import csv
 from collections import Counter
+import nltk
+nltk.data.path.append('/root/lyj/nltk_data/')
 from nltk.util import ngrams
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -125,7 +127,7 @@ class GenericEvaluator:
         self.entity_dict = {}
         filename = result_path.split('/')[-1]
         dump_dir = './sheets/' + filename.replace('.csv','.report.txt')
-        # self.dump_file = open(dump_dir,'w')
+        self.dump_file = open(dump_dir,'w')
 
     def _print_dict(self, dic):
         for k, v in sorted(dic.items(),key=lambda x:x[0]):

@@ -307,31 +307,6 @@ class UserNlg(AbstractNlg):
                 a_copy2 = copy.deepcopy(a)
                 if a.act in actions_without_parameters:
                     str_actions.append(self.sample(templates[a.act]))
-
-                # elif a.act == UserAct.INFORM_TYPE:
-                    # args = [p + " " + v if p!='pricerange' else 'price range' + " " + v for p, v in a.parameters.items()]
-                    # sent = self.sample(templates[a.act]) + ", ".join(args)
-                    # str_actions.append(sent)
-
-                # elif a.act == UserAct.INFORM_TYPE_CHANGE:
-                #     args = [p + " " + v if p!='pricerange' else 'price range' + " " + v  for p, v in a.parameters.items()]
-                #     sent = self.sample(templates[a.act]) + ", ".join(args)
-                #     str_actions.append(sent)
-
-                # elif a.act == UserAct.ASK_INFO:
-                #     args = [p for p in a.parameters]
-                #     sent = self.sample(templates[a.act]) + " ".join(args) + "?"
-                #     str_actions.append(sent)
-
-                # elif a.act in [UserAct.MAKE_RESERVATION, UserAct.MAKE_RESERVATION_CHANGE_TIME]:
-                #     sent = self.sample(templates[a.act])
-                #     if 'people' in a.parameters:
-                #         sent = sent.replace("[people]", a.parameters['people'])
-                #     if 'day' in a.parameters:
-                #         sent = sent.replace("[day]", a.parameters['day'])
-                #     if 'time' in a.parameters:
-                #         sent = sent.replace("[time]", a.parameters['time'])
-
                 elif a_copy2.parameters == {}:
                     # # no slots in the sentence
                     sent = templates[a_copy2.act][0]['none']

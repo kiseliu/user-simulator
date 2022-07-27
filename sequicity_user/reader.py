@@ -13,7 +13,6 @@ import time, datetime
 import pdb
 
 
-
 def clean_replace(s, r, t, forward=True, backward=False):
     def clean_replace_single(s, r, t, forward, backward, sidx=0):
         idx = s[sidx:].find(r)
@@ -128,12 +127,10 @@ class _ReaderBase:
                 return self._item2idx['<unk>']
 
         def decode(self, idx):
-            # pdb.set_trace()
             if int(idx) < len(self):
                 return self._idx2item[int(idx)]
             else:
                 return 'ITEM_%d' % (idx - cfg.vocab_size)
-
 
     def __init__(self):
         self.train, self.dev, self.test = [], [], []
@@ -459,12 +456,7 @@ class CamRest676Reader(_ReaderBase):
     def db_search(self, constraints):
         match_results = []
         for entry in self.db:
-            if 'location' in entry:
-                del entry['location']
-            # entry_values_list = list(entry.values())
-            # print(entry.values())
-            # pdb.set_trace()
-            entry_values = ' '.join(entry.values())
+            entry_values = ' '.join([str(item) for item in entry.values()])
             match = True
             for c in constraints:
                 if c not in entry_values:
@@ -1000,8 +992,6 @@ class User_Simulator_Act_Reader(User_Simulator_Reader):
                 prev_response = response
             encoded_data.append(encoded_dial)
         return encoded_data
-
-
 
 
 class KvretReader(_ReaderBase):

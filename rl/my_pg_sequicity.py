@@ -140,9 +140,9 @@ class PolicyGradientREINFORCE(object):
                         return explored_act, turn_num, prev_z, turn_states
                 else:
                     bit_vecs = torch.tensor(bit_vecs, dtype=torch.float32, device=self.device, requires_grad=False)
-                    print("bit_vecs in sampleAction", bit_vecs)
+                    # print("bit_vecs in sampleAction", bit_vecs)
                     output_after_bit = bit_vecs * output
-                    print("output_after_bit in sampleAction", output_after_bit)
+                    # print("output_after_bit in sampleAction", output_after_bit)
 
                     if explored_act is None:
                         return output_after_bit.max(1)[1].view(1, 1), turn_num, prev_z, turn_states

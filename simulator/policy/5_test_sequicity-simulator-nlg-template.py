@@ -233,7 +233,7 @@ def load_policy_model(model_dir):
     return net
 
 
-policy_net = load_policy_model("/home/wyshi/simulator/model/save/sl_simulator/template/oneHot_oldReward_bitMore/0_2019-5-19-23-46-10-6-139-1.pkl")
+policy_net = load_policy_model("./model/save/sl_simulator/template/oneHot_oldReward_bitMore/0_2019-5-19-23-46-10-6-139-1.pkl")
 
 
 optimizer = optim.Adam(lr=config.lr, params=policy_net.parameters(),

@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/wyshi/simulator")
+sys.path.append("./")
 from simulator.loose_user import LooseUser
 # from simulator.user import Goal
 from simulator.user import User
@@ -13,6 +13,7 @@ import numpy as np
 from simulator.agent.core import SystemAct
 from config import Config
 config = Config()
+from tqdm import tqdm
 
 config.use_new_reward = False
 def accum_slots(usr_act_turns):

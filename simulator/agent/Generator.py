@@ -84,7 +84,7 @@ class Generator(object):
         # if isinstance(label_utt, str):
         #     label_utt = [label_utt]
         if Config.generator_debug:
-            print("act_param: {}".format(act_param))
+            print("act_param to retrieve: {}".format(act_param))
             # print("label_utt: {}".format(label_utt))
         loc = self.get_filter(act_param=act_param, used_templates=used_templates)
         if loc is None:

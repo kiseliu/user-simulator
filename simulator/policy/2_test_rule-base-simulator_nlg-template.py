@@ -1,5 +1,5 @@
 import sys
-sys.path.append("/home/wyshi/simulator")
+sys.path.append("./")
 from simulator.user import User, Goal
 from simulator.loose_user import LooseUser
 from simulator.loose_system import LooseSystem
@@ -229,7 +229,7 @@ def load_policy_model(model_dir="model/test_nlg_no_warm_up_with_nlu.pkl"):
     return net
 
 
-policy_net = load_policy_model("/home/wyshi/simulator/model/save/template/oneHot_newReward_bitMore/0_2019-5-18-21-59-15-5-138-1.pkl")
+policy_net = load_policy_model("model/save/template/oneHot_newReward_bitMore/0_2019-5-18-21-59-15-5-138-1.pkl")
 
 
 optimizer = optim.Adam(lr=config.lr, params=policy_net.parameters(),
@@ -287,10 +287,10 @@ while True:
             next_state, reward, env.done = result_step_sys
             #next_state = next_state[0]
             sys_sent = "Sorry, an error message occurred."#env.last_sys_sent
-            print(sys_sent)
+            # print(sys_sent)
         else:
             sys_sent = env.last_sys_sent
-            print(sys_sent)
+            # print(sys_sent)
 
             # turker_response =
             next_state, reward, env.done = env.step_user(mode=MODE, mturk_res=None) # turker_response

@@ -3,7 +3,7 @@ import os, sys
 
 class Config(object):
 
-    rule_base_sys_nlu = "/home/wyshi/simulator/simulator/nlu_model/model/model-test-30-new.pkl"
+    rule_base_sys_nlu = "./simulator/nlu_model/model/model-test-30-new.pkl"
 
     use_sl_simulator = True
     use_sl_generative = False
@@ -19,7 +19,7 @@ class Config(object):
 
     # rl
     n_episodes = 30000
-    save_dir = '/home/wyshi/simulator/model/save/template/oneHot_newReward_bitMore/'
+    save_dir = './model/save/template/oneHot_newReward_bitMore/'
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
     use_sequicity_for_rl_model = False

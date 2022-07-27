@@ -11,9 +11,10 @@ from collections import Counter, defaultdict
 from copy import copy
 from itertools import chain
 
+import nltk
+nltk.data.path.append('/root/lyj/nltk_data/')
 from nltk.util import ngrams
 from nltk.probability import FreqDist, ConditionalFreqDist
-from nltk import compat
 
 
 def build_vocabulary(cutoff, *texts):

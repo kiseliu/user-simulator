@@ -230,7 +230,7 @@ def load_policy_model(model_dir):
     return net
 
 
-policy_net = load_policy_model("/home/wyshi/simulator/model/save/nlg_sample/oneHot_newReward_bitMore/best/0_2019-5-19-15-13-5-6-139-1.pkl")
+policy_net = load_policy_model("./model/save/nlg_sample/oneHot_newReward_bitMore/best/0_2019-5-19-15-13-5-6-139-1.pkl")
 
 
 optimizer = optim.Adam(lr=config.lr, params=policy_net.parameters(),
@@ -288,10 +288,10 @@ while True:
             next_state, reward, env.done = result_step_sys
             #next_state = next_state[0]
             sys_sent = "Sorry, an error message occurred."#env.last_sys_sent
-            print(sys_sent)
+            # print(sys_sent)
         else:
             sys_sent = env.last_sys_sent
-            print(sys_sent)
+            # print(sys_sent)
 
             # turker_response =
             next_state, reward, env.done = env.step_user(mode=MODE, mturk_res=None) # turker_response

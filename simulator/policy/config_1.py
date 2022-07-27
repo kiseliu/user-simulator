@@ -16,7 +16,7 @@ class Config(object):
 
     # rl
     n_episodes = 30000
-    save_dir = '/home/wyshi/simulator/model/save/nlg_sample/oneHot_newReward_bitMore/'
+    save_dir = './model/save/nlg_sample/oneHot_newReward_bitMore/'
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
     use_sequicity_for_rl_model = False

@@ -20,8 +20,7 @@ from nltk.tokenize import word_tokenize
 
 class Model:
     def __init__(self, dataset):
-        # # the reader classes of 'sys' and 'user' 
-        # # heritage from camrest
+        # # the reader classes of 'sys' and 'user' heritage from camrest
         reader_dict = {
             'camrest': CamRest676Reader,
             'kvret': KvretReader,
@@ -61,7 +60,6 @@ class Model:
         self.base_epoch = -1
 
     def _convert_batch(self, py_batch, prev_z_py=None):
-        # py_batch = py_batch
         u_input_py = py_batch['user']
         u_len_py = py_batch['u_len']
         kw_ret = {}
@@ -78,7 +76,6 @@ class Model:
                     if word >= cfg.vocab_size:
                         prev_z_py[i][j] = 2 #unk
         elif cfg.prev_z_method == 'separate' and prev_z_py is not None:
-            # print(py_batch['user'])
             for i in range(len(prev_z_py)):
                 eob = self.reader.vocab.encode('EOS_Z2')
                 if eob in prev_z_py[i] and prev_z_py[i].index(eob) != len(prev_z_py[i]) - 1:
@@ -87,7 +84,6 @@ class Model:
                 for j, word in enumerate(prev_z_py[i]):
                     if word >= cfg.vocab_size:
                         prev_z_py[i][j] = 2 #unk
-            # print(py_batch['user'])
             prev_z_input_np = pad_sequences(prev_z_py, cfg.max_ts, padding='post', truncating='pre').transpose((1, 0))
             prev_z_len = np.array([len(_) for _ in prev_z_py])
             prev_z_input = cuda_(Variable(torch.from_numpy(prev_z_input_np).long()))
@@ -96,12 +92,10 @@ class Model:
             kw_ret['prev_z_input_np'] = prev_z_input_np
 
         degree_input_np = np.array(py_batch['degree'])
-        # pdb.set_trace()
         u_input_np = pad_sequences(u_input_py, cfg.max_ts, padding='post', truncating='pre').transpose((1, 0))
         z_input_np = pad_sequences(py_batch['bspan'], padding='post').transpose((1, 0))
         m_input_np = pad_sequences(py_batch['response'], cfg.max_ts, padding='post', truncating='post').transpose(
             (1, 0))
-
 
         u_len = np.array(u_len_py)
         m_len = np.array(py_batch['m_len'])
@@ -148,7 +142,6 @@ class Model:
                     u_input, u_input_np, z_input, m_input, m_input_np, u_len, \
                     m_len, degree_input, kw_ret \
                         = self._convert_batch(turn_batch, prev_z)
-                    # pdb.set_trace()
 
                     loss, pr_loss, m_loss, turn_states = self.m(u_input=u_input, z_input=z_input,
                                                                         m_input=m_input,
@@ -156,13 +149,10 @@ class Model:
                                                                         u_input_np=u_input_np,
                                                                         m_input_np=m_input_np,
                                                                         turn_states=turn_states,
-                                                                        u_len=u_len, m_len=m_len, 
-                                                                        mode='train', 
-                                                                        model=self.dataset, **kw_ret)
+                                                                        u_len=u_len, m_len=m_len, mode='train', model=self.dataset, **kw_ret)
                     loss.backward(retain_graph=turn_num != len(dial_batch) - 1)
                     grad = torch.nn.utils.clip_grad_norm_(self.m.parameters(), 5.0)
                     optim.step()
-                    # pdb.set_trace()
                     sup_loss += loss.data.cpu().numpy()
                     sup_cnt += 1
 
@@ -183,7 +173,6 @@ class Model:
             logging.info('validation loss in epoch %d sup:%f unsup:%f' % (epoch, valid_sup_loss, valid_unsup_loss))
             logging.info('time for epoch %d: %f' % (epoch, time.time()-sw))
             valid_loss = valid_sup_loss + valid_unsup_loss
-            # logging.info('saving model...')
             # self.save_model(epoch)
             if valid_loss <= prev_min_loss:
                 logging.info('saving model...')
@@ -246,20 +235,11 @@ class Model:
                 u_input, u_input_np, z_input, m_input, m_input_np, u_len, \
                 m_len, degree_input, kw_ret \
                     = self._convert_batch(turn_batch, prev_z)
-                # pdb.set_trace()
                 m_idx, z_idx, turn_states = self.m(mode=mode, u_input=u_input, u_len=u_len, z_input=z_input,
                                                    m_input=m_input,
                                                    degree_input=degree_input, u_input_np=u_input_np,
                                                    m_input_np=m_input_np, m_len=m_len, turn_states=turn_states,
                                                    dial_id=turn_batch['dial_id'], **kw_ret)
-                # print('Sys: ' + self.reader.vocab.sentence_decode(m_idx[0], eos='EOS_M'))
-                # print('Slots: ' + self.reader.vocab.sentence_decode(z_idx[0], eos='EOS_Z2'))
-                # filled_sent = self.fill_sentence(m_idx, z_idx)
-                # print('Sys: ' + filled_sent)
-                # print('-------------------------------------------------------\n')
-
-                # pdb.set_trace()
-
                 self.reader.wrap_result(turn_batch, m_idx, z_idx, prev_z=prev_z)
                 prev_z = z_idx
         ev = self.EV(result_path=cfg.result_path)
@@ -268,7 +248,6 @@ class Model:
         return res
 
     def interactive(self):
-
         turn_batch = {
                         'dial_id': [0],
                         'turn_num': [0],
@@ -286,18 +265,14 @@ class Model:
         prev_z = None
         prev_m = []
         turn_num = 0
-        # print('starting the conversation, what can I help you?')
-        # print('I am looking for a nice restaurant in the center of town.')
+
         while True:
             usr_utt = input('User: ').lower()
             usr_utt_tokenized = word_tokenize(usr_utt) + ['EOS_U']
             usr_utt_encoded   = self.reader.vocab.sentence_encode(usr_utt_tokenized)
-            # z_input = ['EOS_Z1', 'EOS_Z3', 'EOS_Z4', 'EOS_Z5', 'EOS_Z2']
-            # m_input = []
 
             if turn_batch['turn_num'][0] > 10 or usr_utt == 'close':
-                break;
-
+                break
 
             if turn_batch['turn_num'] == [0]:
                 turn_batch['user'] = [usr_utt_encoded]
@@ -324,17 +299,15 @@ class Model:
             print('Sys: ' + self.reader.vocab.sentence_decode(m_idx[0], eos='EOS_M'))
             print('Slots: ' + self.reader.vocab.sentence_decode(z_idx[0], eos='EOS_Z2'))
             print('-------------------------------------------------------\n')
-            # pdb.set_trace()
+
             prev_z = z_idx
             prev_m = self.reader.vocab.sentence_decode(m_idx[0], eos='EOS_M')
-
 
             turn_num += 1
             turn_batch['turn_num'] = [turn_num]
             turn_batch['bspan'] = prev_z
 
     def fill_sentence(self, m_idx, z_idx):
-
         sent = self.reader.vocab.sentence_decode(m_idx[0], eos='EOS_M').split()
         slots = [self.reader.vocab.decode(z) for z in z_idx[0]]
         constraints = slots[:slots.index('EOS_Z1')]
@@ -382,7 +355,6 @@ class Model:
         unsup_loss /= (unsup_cnt + 1e-8)
         self.m.train()
         print('result preview...')
-
         if cfg.dataset == 'usr_act':
             self.eval_act_classfier()
         else:
@@ -461,7 +433,6 @@ class Model:
         if not path:
             path = cfg.model_path
         all_state = torch.load(path, map_location='cpu')
-        # pdb.set_trace()
         self.m.load_state_dict(all_state['lstd'])
         self.base_epoch = all_state.get('epoch', 0)
 
@@ -495,8 +466,8 @@ class Model:
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-mode')
-    parser.add_argument('-model')
+    parser.add_argument('-mode', default='train')
+    parser.add_argument('-model', default='tsdf-usr')
     parser.add_argument('-cfg', nargs='*')
     args = parser.parse_args()
 
@@ -541,9 +512,9 @@ def main():
         else:
             m.eval()
     elif args.mode == 'rl':
+        # m.load_model('./models/camrest.pkl')
         m.load_model()
         m.reinforce_tune()
-
     elif args.mode == 'interact':
         m.load_model()
         m.interactive()

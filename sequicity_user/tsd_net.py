@@ -95,7 +95,6 @@ class Attn(nn.Module):
     def score(self, hidden, encoder_outputs):
         max_len = encoder_outputs.size(1)
         H = hidden.repeat(max_len, 1, 1).transpose(0, 1)
-        # pdb.set_trace()
         energy = torch.tanh(self.attn(torch.cat([H, encoder_outputs], 2)))  # [B,T,2H]->[B,T,H]
         energy = energy.transpose(2, 1)  # [B,H,T]
         v = self.v.repeat(encoder_outputs.size(0), 1).unsqueeze(1)  # [B,1,H]
@@ -242,7 +241,6 @@ class ResponseDecoder(nn.Module):
         self.attn_z = Attn(hidden_size)
         self.attn_u = Attn(hidden_size)
         self.attn_g = Attn(hidden_size)
-        # self.attn_g = Attn(hidden_size)
         self.gru = gru
         init_gru(self.gru)
         self.proj = proj
@@ -275,13 +273,11 @@ class ResponseDecoder(nn.Module):
         return result
 
     def forward(self, z_enc_out, u_enc_out, u_input_np, m_t_input, degree_input, last_hidden, z_input_np, g_enc_out=None, last_hidden_g=None,**kwargs):
-
         # # adding goal for user utterance decoding
         g_input_np = kwargs.get('g_input_np', None)
         if g_input_np is None:
-            sparse_z_input = Variable(self.get_sparse_selective_input(z_input_np), requires_grad=False)
+            sparse_z_input = cuda_(Variable(self.get_sparse_selective_input(z_input_np), requires_grad=False))
 
-            # pdb.set_trace()
             m_embed = self.emb(m_t_input)
             z_context = self.attn_z(last_hidden, z_enc_out, mask=True, stop_tok=[self.vocab.encode('EOS_Z2')],
                                     inp_seqs=z_input_np)
@@ -291,7 +287,6 @@ class ResponseDecoder(nn.Module):
             gru_out, last_hidden = self.gru(gru_in, last_hidden)
             gen_score = self.proj(torch.cat([z_context, u_context, gru_out], 2)).squeeze(0)
             z_copy_score = torch.tanh(self.proj_copy2(z_enc_out.transpose(0, 1)))
-
             z_copy_score = torch.matmul(z_copy_score, gru_out.squeeze(0).unsqueeze(2)).squeeze(2)
             # z_copy_score = z_copy_score.cpu()
             z_copy_score_max = torch.max(z_copy_score, dim=1, keepdim=True)[0]
@@ -317,7 +312,6 @@ class ResponseDecoder(nn.Module):
                                     inp_seqs=u_input_np)
             g_context = self.attn_g(last_hidden_g, g_enc_out, mask=True, stop_tok=[self.vocab.encode('EOS_Z0')],
                                     inp_seqs=g_input_np)
-            # g_context = self.attn_g()
             gru_in = torch.cat([m_embed, u_context, z_context, g_context, degree_input.unsqueeze(0)], dim=2)
             gru_out, last_hidden = self.gru(gru_in, last_hidden)
             gen_score = self.proj(torch.cat([z_context, u_context, g_context, gru_out], 2)).squeeze(0)
@@ -365,17 +359,13 @@ class ResponseActClassifier(nn.Module):
         self.softmax = nn.Softmax(dim=2)
 
     def forward(self, z_enc_out, last_hidden_z, u_enc_out, last_hidden_u, g_enc_out, last_hidden_g,  **kwargs):
-        
         u_context, last_hidden_u = self.gru_u(u_enc_out, last_hidden_u)
         z_context, last_hidden_z = self.gru_z(z_enc_out, last_hidden_z)
         if g_enc_out is None:
-
             hidden = torch.tanh(self.linear_1(torch.cat([last_hidden_u, last_hidden_z], dim=2)))
             output = self.softmax(self.linear_2(hidden))
             return output
-
         else:
-
             g_context, last_hidden_g = self.gru_g(g_enc_out, last_hidden_g)
             hidden = torch.tanh(self.linear_1(torch.cat([last_hidden_u, last_hidden_z, last_hidden_g], dim=2)))
             output = self.softmax(self.linear_2(hidden))#.squeeze(0)
@@ -424,7 +414,6 @@ class TSD(nn.Module):
                 self.forward_turn(u_input, u_len, m_input=m_input, m_len=m_len, z_input=z_input, mode='train',
                                   turn_states=turn_states, degree_input=degree_input, u_input_np=u_input_np,
                                   m_input_np=m_input_np, **kwargs)
-
             loss, pr_loss, m_loss = self.supervised_loss(torch.log(pz_proba), torch.log(pm_dec_proba),
                                                          z_input, m_input)
             return loss, pr_loss, m_loss, turn_states
@@ -464,9 +453,9 @@ class TSD(nn.Module):
         prev_z_input_np = kwargs.get('prev_z_input_np', None)
         prev_z_len = kwargs.get('prev_z_len', None)
 
+        g_input = kwargs.get('g_input', None)
         g_input_np = kwargs.get('g_input_np', None)
         g_input_len = kwargs.get('g_input_len', None)
-        g_input = kwargs.get('g_input', None)
         g_enc_out = None
         last_hidden_g = None
 
@@ -480,16 +469,18 @@ class TSD(nn.Module):
             enc_rand = False
         else:
             enc_rand = True
+
         if prev_z_input is not None:
             pv_z_enc_out, _, pv_z_emb = self.u_encoder(prev_z_input, prev_z_len, enc_rand=enc_rand)
+
         if g_input is not None:
             g_enc_out, g_enc_hidden, g_emb = self.u_encoder(g_input, g_input_len, enc_rand=enc_rand)
             last_hidden_g = g_enc_hidden[:-1]
+
         u_enc_out, u_enc_hidden, u_emb = self.u_encoder(u_input, u_len, enc_rand=enc_rand)
         last_hidden = u_enc_hidden[:-1]
         z_tm1 = cuda_(Variable(torch.ones(1, batch_size).long() * 3))  # GO_2 token
         m_tm1 = cuda_(Variable(torch.ones(1, batch_size).long()))  # GO token
-
         if mode == 'train':
             pz_dec_outs = []
             pz_proba = []
@@ -618,7 +609,6 @@ class TSD(nn.Module):
             if hiddens[i] is None:
                 hiddens[i] = last_hidden[:, i, :]
         last_hidden = torch.stack(hiddens, dim=1)
-        # print(decoded)
         decoded = torch.stack(decoded, dim=0).transpose(0, 1)
         decoded = list(decoded)
         decoded = [list(_) for _ in decoded]
@@ -754,7 +744,6 @@ class TSD(nn.Module):
         return [list(_.view(-1)) for _ in decoded]
 
     def supervised_loss(self, pz_proba, pm_dec_proba, z_input, m_input):
-        # pdb.set_trace()
         pz_proba, pm_dec_proba = pz_proba[:, :, :cfg.vocab_size].contiguous(), pm_dec_proba[:, :,
                                                                                :cfg.vocab_size].contiguous()
         pr_loss = self.pr_loss(pz_proba.view(-1, pz_proba.size(2)), z_input.view(-1))

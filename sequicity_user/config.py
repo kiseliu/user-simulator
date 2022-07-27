@@ -5,7 +5,7 @@ import configparser
 class _Config:
     def __init__(self):
         self._init_logging_handler()
-        self.cuda_device = 4
+        self.cuda_device = 0
         self.eos_m_token = 'EOS_M'       
         self.beam_len_bonus = 0.6
 
@@ -42,7 +42,6 @@ class _Config:
         self.early_stop_count = 3
         self.cuda = True
 
-
         self.vocab_path = './vocab/vocab-camrest.pkl'
         self.data = './data/CamRest676/CamRest676.json'
         self.entity = './data/CamRest676/CamRestOTGY.json'
@@ -50,7 +49,7 @@ class _Config:
         self.model_path = './models/camrest.pkl'
         self.result_path = './results/camrest-rl.csv'
 
-        self.glove_path = '../sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.dropout_rate = 0.5
@@ -81,9 +80,9 @@ class _Config:
         self.cuda = True
 
         self.split = (9, 1, 1)
-        self.model_path = './models/multiwoz_sys911.pkl'
-        self.result_path = './results/multiwoz_sys.csv'
-        self.vocab_path = './vocab/vocab-multiwoz_sys.pkl'
+        self.model_path = './sequicity_user/models/multiwoz_sys911.pkl'
+        self.result_path = './sequicity_user/results/multiwoz_sys.csv'
+        self.vocab_path = './sequicity_user/vocab/vocab-multiwoz_sys.pkl'
 
         self.data = './data/multiwoz-master/data/multi-woz/rest_sys.json'
         self.entity = './data/multiwoz-master/data/multi-woz/rest_OTGY.json'
@@ -92,7 +91,7 @@ class _Config:
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '../sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.dropout_rate = 0.5
@@ -123,18 +122,6 @@ class _Config:
         self.cuda = True
         self.degree_size = 1
 
-
-
-        # self.split = (9, 1, 1)
-        # self.model_path = './models/multi_woz_simulator911_goal.pkl'
-        # self.result_path = './results/multi_woz_simulator911_goal.csv'
-        # self.vocab_path = './vocab/vocab-multi_woz_simulator911_goal.pkl'
-
-        # self.data = './simulator/data/multiwoz-master/data/multi-woz/rest_usr_simulator.json'
-        # self.entity = './simulator/data/multiwoz-master/data/multi_woz/rest_OTGY.json'
-        # self.db = './simulator/data/multiwoz-master/data/multi-woz/restaurant_db.json'
-
-
         self.split = (9, 1, 1)
         self.root_dir = "./sequicity_multiwoz_0.4"
         self.model_path = self.root_dir + '/models/multi_woz_simulator911_goal.pkl'
@@ -147,7 +134,7 @@ class _Config:
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '../sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.dropout_rate = 0.5
         self.epoch_num = 100 # triggered by early stop
@@ -189,7 +176,7 @@ class _Config:
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '../sequicity/data/glove/glove.6B.50d.txt'
+        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.dropout_rate = 0.5
         self.epoch_num = 100 # triggered by early stop
@@ -205,7 +192,6 @@ class _Config:
         self.skip_unsup = False
         self.truncated = False
         self.pretrain = False
-
 
     def _kvret_tsdf_init(self):
         self.prev_z_method = 'separate'
@@ -257,7 +243,7 @@ class _Config:
         current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 
         stderr_handler = logging.StreamHandler()
-        file_handler = logging.FileHandler('./log/log_{}.txt'.format(current_time))
+        file_handler = logging.FileHandler('./sequicity_user/log/log_{}.txt'.format(current_time))
         logging.basicConfig(handlers=[stderr_handler, file_handler])
         logger = logging.getLogger()
         logger.setLevel(logging.INFO)

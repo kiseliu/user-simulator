@@ -89,7 +89,7 @@ class PolicyGradientREINFORCE(object):
         # epsilon-greedy exploration strategy
         if random.random() < self.exploration and not rl_test:
             if self.verbose:
-                print("exploration")
+                print("exploration: ", self.exploration)
 
             if bit_vecs is not None:
                 available_act = [idx for idx, bit_vecs in enumerate(bit_vecs) if bit_vecs == 1]
@@ -100,7 +100,7 @@ class PolicyGradientREINFORCE(object):
             else:
                 available_act_p = [1/len(available_act)] * len(available_act)
                 assert available_act_p
-            print("available_Act in sampleAction", available_act)
+            # print("available_Act in sampleAction", available_act)
             selected_act = np.random.choice(available_act, replace=False, p=available_act_p)
 
             return torch.tensor([[selected_act]],
@@ -142,9 +142,9 @@ class PolicyGradientREINFORCE(object):
 
                         valid_probs = [output[0][i] for i, b in enumerate(bit_vecs) if b == 1]
                         bit_vecs = torch.tensor(bit_vecs, dtype=torch.float32, device=self.device, requires_grad=False)
-                        print("bit_vecs in sampleAction", bit_vecs)
+                        # print("bit_vecs in sampleAction", bit_vecs)
                         output_after_bit = bit_vecs * output
-                        print("output_after_bit in sampleAction", output_after_bit)
+                        # print("output_after_bit in sampleAction", output_after_bit)
 
                         ###############################################################
                         if len(set(valid_probs)) == 1:
@@ -174,9 +174,7 @@ class PolicyGradientREINFORCE(object):
                 # clean up
                 self.train_iteration += 1
                 self.cleanUp()
-                # pdb.set_trace()
                 return
-                # pdb.set_trace()
             else:
                 if len(self.memory) % self.config.update_every != 0:
                     self.train_iteration += 1
@@ -285,74 +283,6 @@ class PolicyGradientREINFORCE(object):
                 # pdb.set_trace()
         torch.nn.utils.clip_grad_norm_(self.policy_network.parameters(), self.max_gradient)
         self.optimizer.step()
-
-        # if not self.replay:
-        #     # reg_loss = tf.reduce_sum([tf.reduce_sum(tf.square(x)) for x in policy_network_variables])
-        #     reg_loss = []
-        #     for par in self.policy_network.parameters():
-        #         reg_loss.append(par.pow(2).sum().view(1, 1))
-        #
-        #     # pdb.set_trace()
-        #     reg_loss = torch.cat(reg_loss).sum()
-        #
-        #     loss = loss + self.reg_param * reg_loss
-        #
-        #     # Optimize the model
-        #     if loss.item() == 0:
-        #         pass
-        #         #pdb.set_trace()
-        #     print("#"*30)
-        #     print("loss", loss)
-        #     print("#"*30)
-        #
-        #     # for param in self.policy_network.named_parameters():
-        #     #     if param[1].grad is None:
-        #     #         pdb.set_trace()
-        #     #         param[].grad.data.clamp_(-1, 1)
-        #
-        #     self.optimizer.zero_grad()
-        #     loss.backward()
-        #     torch.nn.utils.clip_grad_norm_(self.policy_network.parameters(), self.max_gradient)
-        #     self.optimizer.step()
-        #
-        # else:
-        #     if len(self.memory) <= self.batch_size:
-        #         self.memory.append(loss.view(1, 1))
-        #             #pdb.set_trace()
-        #         print("#"*30)
-        #         print("loss", loss)
-        #         print("#"*30)
-        #
-        #
-        #     else:
-        #
-        #         loss = self.sample(self.memory, self.batch_size)
-        #         loss = list(loss)
-        #         loss = torch.cat(loss).sum()
-        #         # reg_loss = tf.reduce_sum([tf.reduce_sum(tf.square(x)) for x in policy_network_variables])
-        #         reg_loss = []
-        #         for par in self.policy_network.parameters():
-        #             reg_loss.append(par.pow(2).sum().view(1, 1))
-        #
-        #         # pdb.set_trace()
-        #         reg_loss = torch.cat(reg_loss).sum()
-        #
-        #         loss = loss + self.reg_param * reg_loss
-        #
-        #         # Optimize the model
-        #         if loss.item() == 0:
-        #             pass
-        #             #pdb.set_trace()
-        #         print("#"*30)
-        #         print("loss", loss)
-        #         print("#"*30)
-        #
-        #         self.optimizer.zero_grad()
-        #         loss.backward()
-        #         torch.nn.utils.clip_grad_norm(self.policy_network.parameters(), 40)
-        #         # for param in self.policy_network.parameters():
-        #         #     param.grad.data.clamp_(-1, 1)
-        #         self.optimizer.step()
 
         self.annealExploration()
         self.train_iteration += 1

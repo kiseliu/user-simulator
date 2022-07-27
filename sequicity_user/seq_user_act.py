@@ -1,7 +1,7 @@
 import sys, os, re, pdb
 # sys.path.append('/home/wyshi/simulator/sequcity_user/')
 # sys.path.append('./sequcity_mulitwoz_0.4/')
-sys.path.append('/home/wyshi/simulator/')
+sys.path.append('./')
 import logging, random
 import torch
 import numpy as np
@@ -44,6 +44,7 @@ class Seq_User_Act(Seq_User):
         self.state_list = []
         self.act = ''
         self.prev_usr = ''
+        self.name = 'US-RNNR' if nlg_sample else 'US-RNNT'
 
         self._set_initial_model_parameters()
 
@@ -72,6 +73,7 @@ class Seq_User_Act(Seq_User):
         self.check_info = dialog_config.INFO_CHECK_NOTYET
         self.check_reservation = []#dialog_config.RESERVATION_CHECK_NOTYET
         self.dialog_status = dialog_config.NO_OUTCOME_YET
+        self.fail_reason = ''
 
     def _set_initial_goal_dic(self):
         # # goal transfer into list
@@ -165,14 +167,11 @@ class Seq_User_Act(Seq_User):
 
         # # generating sentence with templats
         usr_act = Action(self.act, slot_dict)
-        # pdb.set_trace()
-        # print(usr_act)
-
 
         if self.act == 'inform_type' and slot_dict == {} and sys_act.act == SystemAct.ASK_TYPE:
             usr_response_sent = 'i do not care.'
         else:
-            if self.nlg_sample:
+            if self.nlg_sample:  # Retrieval
                 assert self.nlg_templates
                 assert self.generator
                 # usr_response_sent, lexicalized_usr_act = self.nlg.generate_sent(usr_act, templates=self.nlg_templates, generator=1)
@@ -183,9 +182,8 @@ class Seq_User_Act(Seq_User):
                 usr_response_sent, lexicalized_usr_act = self.nlg.generate_sent(usr_act, templates=self.nlg_templates,
                                                                             generator=self.generator, context=prev_sys,
                                                                             seq2seq=None)
-            else:
-                # print('')
-                if self.seq2seq is None:
+            else:  
+                if self.seq2seq is None:  # template 
                     print("supervised templates")
                     assert self.nlg_template
                     assert not self.nlg_sample

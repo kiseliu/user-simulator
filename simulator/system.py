@@ -259,7 +259,7 @@ class System(object):
             pass
 
         if provided_sys_act is not None:
-            print("using provided sys act")
+            # print("using provided sys act")
             sys_act = self._index_to_action(provided_sys_act, usr_act=usr_act)
         else:
             print("using rule_policy")
@@ -294,48 +294,9 @@ class System(object):
             sys_act = self._response_GOODBYE()
 
         return sys_act
-        """
-        queryable = ((len(self.state['informed']['pricerange']) > 0) and (len(self.state['informed']['area']) > 0) and (len(self.state['informed']['food']) > 0)) \
-                    or (len(self.state['informed']['name']) > 0)
-        if not queryable:
-            assert usr_act.act == UserAct.INFORM_TYPE
-            # the only option is to ask_type until all the entities are collected
-            possible_actions = [SystemAct.ASK_TYPE]
-            selected_action = self.sample(possible_actions)
 
-            if selected_action == SystemAct.ASK_TYPE:
-                params = {}
-                for entity, value in self.state['informed'].items():
-                    if entity != 'name':
-                        if len(value) == 0:
-                            params[entity] = None
-            else:
-                raise ValueError("disallowed sys_Act {}".format(selected_action))
-
-            return Action(selected_action, params)
-        else:
-
-
-        if self.current_slot_id < len(self.request_set):
-            slot = self.request_set[self.current_slot_id]
-            self.current_slot_id += 1
-
-            act_slot_response = {}
-            act_slot_response['diaact'] = "request"
-            act_slot_response['inform_slots'] = {}
-            act_slot_response['request_slots'] = {slot: "UNK"}
-        elif self.phase == 0:
-            act_slot_response = {'diaact': "inform", 'inform_slots': {'taskcomplete': "PLACEHOLDER"},
-                                 'request_slots': {}}
-            self.phase += 1
-        elif self.phase == 1:
-            act_slot_response = {'diaact': "thanks", 'inform_slots': {}, 'request_slots': {}}
-
-        return self.action_index(act_slot_response)
-        """
 
     def nlu(self, usr_sent, usr_act=None, mode=None):
-
         if (mode == dialog_config.RANDOM_ACT) or (mode == dialog_config.RL_WARM_START):
             # return the true usr_act
             delex_sent, kv_dic = delexicalize.delexicalize_one_sent(usr_sent)
@@ -366,7 +327,11 @@ class System(object):
                 else:
                     continue
 
-            usr_act_str = single_pred(self.nlu_model, delex_sent)[0].lower()
+            if len(set(delex_sent.split())) == 1:
+                print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+                usr_act_str = UserAct.GOODBYE
+            else:
+                usr_act_str = single_pred(self.nlu_model, delex_sent)[0].lower()
 
             # import pdb
             # pdb.set_trace()
@@ -375,7 +340,6 @@ class System(object):
                     usr_act_str = UserAct.INFORM_TYPE
                 else:
                     usr_act_str = UserAct.INFORM_TYPE
-                # pass
             if usr_act_str == UserAct.INFORM_TYPE:
                 pass
             elif usr_act_str == UserAct.INFORM_TYPE_CHANGE:
@@ -387,13 +351,6 @@ class System(object):
                     params.update({'address': None})
                 if "postcode" in usr_sent or "post code" in usr_sent:
                     params.update({'postcode': None})
-                # params.update({'phone': None})
-                # if "price" in usr_sent:
-                #     params.update({'price': None})
-                # if "area" in usr_sent:
-                #     params.update({'area': None})
-                # if "food" in usr_sent or "cuisine" in usr_sent or "type" in usr_sent:
-                #     params.update({'food': None})
             elif usr_act_str == UserAct.ANYTHING_ELSE:
                 pass
             elif usr_act_str == UserAct.MAKE_RESERVATION:
@@ -405,10 +362,9 @@ class System(object):
             else:
                 usr_act_str = UserAct.INFORM_TYPE
 
-
             usr_act = Action(usr_act_str, params)
             self.last_usr_sent = delex_sent
-            print(usr_act)
+            # print('system nlu (usr_act) = ', usr_act)
             return usr_act
 
     def action_to_index(self, sys_act_str):
@@ -574,7 +530,7 @@ class System(object):
         # if agent_last:
         #     for slot in agent_last['inform_slots'].keys():
         #         agent_inform_slots_rep[0, self.slot_set[slot]] = 1.0
-#
+        #
         # ########################################################################
         # #   Encode last agent request slots
         # ########################################################################
@@ -582,7 +538,7 @@ class System(object):
         # if agent_last:
         #     for slot in agent_last['request_slots'].keys():
         #         agent_request_slots_rep[0, self.slot_set[slot]] = 1.0
-#
+        #
         # turn_rep = np.zeros((1, 1)) + state['turn'] / 10.
 
         ########################################################################
@@ -598,7 +554,7 @@ class System(object):
         #for slot in kb_results_dict:
         #    if slot in self.slot_set:
         #        kb_count_rep[0, self.slot_set[slot]] = kb_results_dict[slot] / 100.
-#
+        #       
         #########################################################################
         ##   Representation of KB results (binary)
         #########################################################################
@@ -770,10 +726,6 @@ class System(object):
 
     def _response_GOODBYE(self):
         return Action(SystemAct.GOODBYE, None)
-
-
-
-
 
 
 if __name__ == "__main__":
