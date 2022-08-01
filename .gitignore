@@ -18,3 +18,4 @@ data/multiwoz-master/data/multi-woz/data.json
 data/multiwoz-master/data/multi-woz/delex.json
 /test/*    # parlai
 evaluation/*
+*.log
