@@ -49,7 +49,7 @@ class _Config:
         self.model_path = './models/camrest.pkl'
         self.result_path = './results/camrest-rl.csv'
 
-        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
+        self.glove_path = '/home/liuyajiao/pkgs/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.dropout_rate = 0.5
@@ -91,7 +91,7 @@ class _Config:
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
+        self.glove_path = '/home/liuyajiao/pkgs/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.dropout_rate = 0.5
@@ -134,7 +134,7 @@ class _Config:
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
+        self.glove_path = '/home/liuyajiao/pkgs/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.dropout_rate = 0.5
         self.epoch_num = 100 # triggered by early stop
@@ -176,7 +176,7 @@ class _Config:
 
         self.beam_len_bonus = 0.5
         self.prev_z_method = 'separate'
-        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
+        self.glove_path = '/home/liuyajiao/pkgs/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.dropout_rate = 0.5
         self.epoch_num = 100 # triggered by early stop

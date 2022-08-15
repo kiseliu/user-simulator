@@ -2,7 +2,7 @@ import pickle as pkl
 
 class Config():
     f_path = './data/multiwoz-master/data/multi-woz/nlu/'
-    vector_cache_path = '/root/lyj/glove.6B/'
+    vector_cache_path = '/home/liuyajiao/pkgs/glove.6B/'
     feature_name = ['utt']
     label_name = 'y'
     use_gpu = False#torch.cuda.is_available()

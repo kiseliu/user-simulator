@@ -1,99 +1,46 @@
 from collections import deque
+import os
+import sys
+root_path = os.path.abspath(__file__)
+sys.path.append(os.path.dirname(root_path))
 
-from rl.my_pg import PolicyGradientREINFORCE
-from rl.policy_model import Net
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
+import time
+import random
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-# import gym
+
 from beeprint import pp
+
 from simulator.agent.core import Action, UserAct, SystemAct
-# from sequicity.model import Model
-
-# env_name = 'CartPole-v0'
-# env = gym.make(env_name)
-
 from simulator.user import User
 from simulator.loose_user import LooseUser
-from sequicity_user.seq_user import Seq_User
-from sequicity_user.seq_user_act import Seq_User_Act
 from simulator.system import System
 from simulator.loose_system import LooseSystem
 from simulator.env import Enviroment
+from rl.my_pg import PolicyGradientREINFORCE
+from rl.policy_model import Net
 import simulator.dialog_config as dialog_config
-import numpy as np
 from config import Config
-import pdb
-from simulator.agent.core import SystemAct
-from sequicity.config import global_config as seq_cfg
-# from sequicity.model import load_rl_model
+
+from sequicity_user.seq_user import Seq_User
+from sequicity_user.seq_user_act import Seq_User_Act
+
 
 config = Config()
 device = config.device
+print('device = ', device)
 
-# ############################## argument ####################################################
-# import tensorflow as tf
-#
-# tf.app.flags.DEFINE_bool("one_hot", True, "The path to save the model")
-# tf.app.flags.DEFINE_bool("new_reward", True, "The path to the csv")
-# tf.app.flags.DEFINE_bool("nlg_sample", True, "The path to the csv")
-# tf.app.flags.DEFINE_integer("with_bit", None, "The path to the csv")
-# tf.app.flags.DEFINE_string("save_dir", None, "The path to the csv")
-# args = tf.app.flags.FLAGS
-#
-# dummy = args.one_hot # hack to get all the configs
-# # pdb.set_trace()
-# config = Config()
-# device = config.device#torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#
-# if args.one_hot:
-#     config.use_sent_one_hot = True
-#     config.use_sent = False
-# else:
-#     config.use_sent_one_hot = False
-#     config.use_sent = True
-#
-# if args.new_reward:
-#     config.use_new_reward = True
-# else:
-#     config.use_new_reward=False
-#
-# if args.with_bit == 0:
-#     config.with_bit = False
-#     config.with_bit_rep_only = False
-#     with_bit_more = False
-#     with_bit_all = False
-# elif args.with_bit == 1:
-#     config.with_bit = True
-#     config.with_bit_rep_only = True
-#     with_bit_more = False
-#     with_bit_all = False
-# elif args.with_bit == 2:
-#     config.with_bit = True
-#     config.with_bit_rep_only = False
-#     with_bit_more = True
-#     with_bit_all = False
-# elif args.with_bit == 3:
-#     config.with_bit = True
-#     config.with_bit_rep_only = False
-#     with_bit_more = False
-#     with_bit_all = True
-#
-# if args.nlg_sample:
-#     config.nlg_sample = True
-# else:
-#     config.nlg_sample = False
-#
-# if args.save_dir:
-#     config.save_dir = args.save_dir
-# ############################## argument ####################################################
-#
-# # pdb.set_trace()
+
+torch.manual_seed(config.seed)
+torch.cuda.manual_seed(config.seed)
+random.seed(config.seed)
+np.random.seed(config.seed)
 
 if config.loose_agents:
     user = LooseUser(nlg_sample=config.nlg_sample, nlg_template=config.nlg_template)
@@ -110,9 +57,8 @@ if config.use_sl_simulator:
 
 
 pp(config)
+print('---' * 30)
 pp(dialog_config)
-
-
 
 env = Enviroment(user=user, system=system, verbose=True, config=config)
 sys_act = None
@@ -138,7 +84,7 @@ def run_one_dialog(env, pg_reinforce):
             bit_vecs = get_bit_vector(system)
         else:
             bit_vecs = None
-        print('bit_vec: ', bit_vecs)
+        # print('*** bit_vec: ', bit_vecs)
         action = pg_reinforce.sampleAction(state, rl_test=True, bit_vecs=bit_vecs)
         action = action.item()
         next_state, reward, done = env.step(provided_sys_act=action, mode=cur_mode)
@@ -337,86 +283,11 @@ def get_bit_vector(system):
             bit_vecs = [1] * dialog_config.SYS_ACTION_CARDINALITY
 
         return bit_vecs
-        assert len(informed_so_far)
-        if np.sum(informed_so_far) > 1:
-            bit_vecs = [1] * dialog_config.SYS_ACTION_CARDINALITY
-            bit_vecs[4] = small_value
 
-            if len(system.state['results']) == 0:
-                bit_vecs[2] = small_value
-                bit_vecs[5] = small_value
-            else:
-                bit_vecs[2] = 1
-                bit_vecs[5] = 1
-
-            if not reservable:
-                bit_vecs[3] = small_value
-            else:
-                # bit_vecs[0] = 0
-                bit_vecs[3] = 1
-                bit_vecs[5] = small_value
-
-            if np.all(informed_so_far):
-                bit_vecs[0] = 0
-
-            return bit_vecs
-        else:
-            bit_vecs = [1, small_value, small_value, small_value, small_value, small_value]
-            return bit_vecs
-
-
-def accum_slots(usr_act_turns):
-    inform_hist = {}
-    book_inform_hist = {}
-    output_str = []
-
-    for usr_act in usr_act_turns:
-
-        if usr_act.act in [UserAct.INFORM_TYPE, UserAct.INFORM_TYPE_CHANGE]:
-            inform_hist.update({k: v for k, v in usr_act.parameters.items() if v != dialog_config.I_DO_NOT_CARE})
-
-        elif usr_act.act in [UserAct.MAKE_RESERVATION, UserAct.MAKE_RESERVATION_CHANGE_TIME]:
-            book_inform_hist.update(usr_act.parameters)
-
-    for slot_name in inform_hist.keys():
-        output_str.append(inform_hist[slot_name])
-    output_str.append('EOS_Z1')
-
-    for slot_name in book_inform_hist.keys():
-        output_str.append(book_inform_hist[slot_name])
-    output_str.append('EOS_Z3')
-
-    if usr_act_turns[-1].act in [UserAct.ASK_INFO]:
-        for slot in usr_act_turns[-1].parameters:
-            output_str.append(slot)
-    output_str.append('EOS_Z2')
-
-    return ' '.join(output_str)
-
-def fill_sentence(self, m_idx, z_idx):
-
-    sent = self.reader.vocab.sentence_decode(m_idx[0], eos='EOS_M').split()
-    slots = [self.reader.vocab.decode(z) for z in z_idx[0]]
-    constraints = slots[:slots.index('EOS_Z1')]
-    db_results = self.reader.db_search(constraints)
-
-    filled_sent = []
-    filled_slot = {}
-    import random
-    if db_results:
-        rand_result = random.choice(db_results)
-        for idx, word in enumerate(sent):
-            if '_SLOT' in word:
-                filled_sent.append(rand_result[word.split('_')[0]])
-                filled_slot[word.split('_')[0]] = rand_result[word.split('_')[0]]
-            else:
-                filled_sent.append(word)
-
-    # filled_sent = ' '.join(sent)
-    return " ".join(sent), ' '.join(filled_sent), filled_slot
 
 def load_policy_model(model_dir="model/test_nlg_no_warm_up_with_nlu.pkl"):
-    model = torch.load(model_dir)
+    print('model_dir = ', model_dir)
+    model = torch.load(model_dir, map_location='cuda:0')
     net = Net(state_dim=dialog_config.STATE_DIM, num_actions=dialog_config.SYS_ACTION_CARDINALITY, config=config).to(device)
     net.load_state_dict(model)
     net.eval()
@@ -428,15 +299,8 @@ else:
     policy_net = Net(state_dim=state_dim, num_actions=num_actions, config=config).to(device)#
 
 
-
-
-
-# optimizer = optim.RMSprop(policy_net.parameters())
 optimizer = optim.Adam(lr=config.lr, params=policy_net.parameters(),
                                   weight_decay=5e-5)
-# net.optimizer = optim.Adam(params=net.parameters(), lr=5e-4, weight_decay=1e-3)
-# net.lr_scheduler = optim.lr_scheduler.StepLR(net.optimizer, step_size=500, gamma=0.95)
-# net.loss_func = nn.CrossEntropyLoss()
 
 pg_reinforce = PolicyGradientREINFORCE(
                      optimizer=optimizer,
@@ -457,24 +321,12 @@ pg_reinforce = PolicyGradientREINFORCE(
                      with_bit=config.with_bit,
                      replay=config.replay)
 
-
+MODE = dialog_config.RL_WARM_START
 WARM_START_EPISODES = config.warm_start_episodes
 MAX_EPISODES = config.n_episodes
 MAX_STEPS    = 200
 TEST_EVERY = 1000
-NUM_TEST = 100
-MODE = dialog_config.RL_WARM_START
-import time
-import random
-
-torch.manual_seed(config.seed)
-torch.cuda.manual_seed(config.seed)
-random.seed(config.seed)
-np.random.seed(config.seed)
-
-
-
-
+NUM_TEST = 200
 
 
 MAX_TEST_SUC = -1
@@ -491,28 +343,24 @@ while True:
         if i_episode >= WARM_START_EPISODES:
             MODE = dialog_config.RL_TRAINING
 
-        if MODE == dialog_config.RL_TRAINING and \
-           (((i_episode - WARM_START_EPISODES + 1) % TEST_EVERY == 0)):# or (i_episode == WARM_START_EPISODES)):
+        if MODE == dialog_config.RL_TRAINING and (i_episode - WARM_START_EPISODES + 1) % TEST_EVERY == 0:
             reward_list, len_list, success_list = test(env=env, pg_reinforce=pg_reinforce, n=NUM_TEST)
             mean_reward_test.append(np.mean(reward_list))
             mean_len_test.append(np.mean(len_list))
             mean_success_test.append(np.mean(success_list))
             test_id.append(i_episode - WARM_START_EPISODES)
 
-        print("-" * 20)
+        print("-*-" * 20)
         # initialize
         state = env.reset(mode=MODE)
-        # state = [state, env.last_usr_sent]
         total_rewards = 0
         total_t = 0
 
         while True:
-            # env.render()s
             if config.with_bit:
                 bit_vecs = get_bit_vector(system)
             else:
                 bit_vecs = None
-            print("bit_Vecs", bit_vecs)
             if MODE == dialog_config.RL_TRAINING:
                 action = pg_reinforce.sampleAction(state, bit_vecs=bit_vecs,
                                                    rl_test=False)
@@ -520,13 +368,10 @@ while True:
             elif MODE == dialog_config.RL_WARM_START:
                 action = None
             next_state, reward, done = env.step(provided_sys_act=action, mode=MODE)
-
             total_rewards += reward
 
             if MODE == dialog_config.RL_WARM_START:
-                # print("here")
                 action = env.system.action_to_index(env.last_sys_act.act)
-            # print(action)
             pg_reinforce.storeRollout(state, action, reward, bit_vecs=bit_vecs)
 
             state = next_state
@@ -535,7 +380,6 @@ while True:
                 break
 
         pg_reinforce.updateModel(mode=MODE)
-
         episode_history.append(total_rewards)
         mean_rewards = np.mean(episode_history)
 
@@ -551,23 +395,19 @@ while True:
         if i_episode > 2500 and mean_rewards < -9:
             break
 
-        if MODE == dialog_config.RL_TRAINING and \
-           (((i_episode - WARM_START_EPISODES + 1) % TEST_EVERY == 0)):# or (i_episode == WARM_START_EPISODES)):
-
-            print(mean_reward_test)
+        if MODE == dialog_config.RL_TRAINING and ((i_episode - WARM_START_EPISODES + 1) % TEST_EVERY == 0):
+            print('mean_reward_test = ', mean_reward_test)
             test_history = zip(test_id, mean_reward_test, mean_len_test, mean_success_test)
 
             pd.DataFrame(test_history, columns=["id", "reward", "len", "success"]).to_csv(config.save_dir + str(cnt) + "_" + cur_time + ".csv", index=False)
-            # pg_reinforce.saver.save(sess, SAVE_DIR, write_meta_graph=False)
             if mean_success_test[-1] >= MAX_TEST_SUC:
                 MAX_TEST_SUC = mean_success_test[-1]
-                torch.save(policy_net.state_dict(), config.save_dir + str(cnt) + "_" + cur_time + ".pkl")
-
+                torch.save(policy_net.state_dict(), config.save_dir + str(cnt) + "_" + cur_time + '_' + str(i_episode) +   ".pkl")
 
     if mean_success_test[-1] >= MAX_TEST_SUC:
         MAX_TEST_SUC = mean_success_test[-1]
         print("max_test_success in the end", MAX_TEST_SUC)
-        torch.save(policy_net.state_dict(), config.save_dir + str(cnt) + "_" + cur_time + ".pkl")
+        torch.save(policy_net.state_dict(), config.save_dir + str(cnt) + "_" + cur_time + '_' + str(i_episode) +   ".pkl")
 
     print(mean_reward_test)
     test_history = zip(test_id, mean_reward_test, mean_len_test, mean_success_test)
@@ -579,4 +419,3 @@ while True:
         break
 
     cnt += 1
-

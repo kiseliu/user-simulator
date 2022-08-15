@@ -77,7 +77,7 @@ class _Config:
 
 
 
-        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
+        self.glove_path = '/home/liuyajiao/pkgs/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.z_length = 12
         self.degree_size = 5
@@ -113,7 +113,7 @@ class _Config:
         self.dev = self.root_dir + 'data/kvret/kvret_dev_public.json'
         self.test = self.root_dir + 'data/kvret/kvret_test_public.json'
         self.entity = self.root_dir + 'data/kvret/kvret_entities.json'
-        self.glove_path = '/root/lyj/glove.6B/glove.6B.50d.txt'
+        self.glove_path = '/home/liuyajiao/pkgs/glove.6B/glove.6B.50d.txt'
         self.batch_size = 32
         self.degree_size = 5
         self.z_length = 8
